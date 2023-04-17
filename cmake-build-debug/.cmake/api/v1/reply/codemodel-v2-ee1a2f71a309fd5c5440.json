@@ -1,0 +1,126 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3
+					],
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "ingredients",
+					"jsonFile" : "directory-ingredients-Debug-68073b56cb467efde5a6.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "ingredients",
+					"targetIndexes" : 
+					[
+						1
+					]
+				},
+				{
+					"build" : "utilities",
+					"jsonFile" : "directory-utilities-Debug-af27b2acd02913042bc0.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "utilities",
+					"targetIndexes" : 
+					[
+						2
+					]
+				},
+				{
+					"build" : "src",
+					"jsonFile" : "directory-src-Debug-c94b7c2814d5a21df52c.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.0"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "src",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					],
+					"name" : "ice_pond",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 3,
+					"id" : "ice_pond::@145eef247bfb46b6828c",
+					"jsonFile" : "target-ice_pond-Debug-b118304f5f879d8e0a3b.json",
+					"name" : "ice_pond",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "ingredients::@1bb7604bb9b5839c4d98",
+					"jsonFile" : "target-ingredients-Debug-47703e3bb639c5ef76f4.json",
+					"name" : "ingredients",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "utilities::@d3b0ab015cfc9b043577",
+					"jsonFile" : "target-utilities-Debug-5c65708807bf4b80fa1a.json",
+					"name" : "utilities",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/bcarl/Ice_Pond_Reflect_Refract/cmake-build-debug",
+		"source" : "C:/Users/bcarl/Ice_Pond_Reflect_Refract"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}

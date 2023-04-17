@@ -1,1 +1,1 @@
-# Ice_Pond_Reflect_Refract
+# Adv. Computer Graphics Final Project
