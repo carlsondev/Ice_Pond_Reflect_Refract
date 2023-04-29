@@ -38,13 +38,15 @@ private:
   GLFWwindow *currentWindow;
 
   GLSLProgram basicShadingProgram;
-
+  GLSLProgram iceShadingProgram;
   // The currently used shader program
   GLSLProgram *activeShaderProgram = nullptr;
 
   // Rendered objects
   Plane *ground_plane = nullptr;
   Cube *ground_base = nullptr;
+
+  Cube *ice = nullptr;
 
   glm::vec2 mousePosition;
 
@@ -63,13 +65,13 @@ private:
 
   // Add color to "ingredients" object using a vector of colors for every
   // vertex.
-  void addColorToObject(TriangleMesh *object, std::vector<glm::vec3> colors);
+  void addColorToObject(TriangleMesh *object, const std::vector<glm::vec3>& colors);
 
   // Add color to "ingredients" object using a single color for every vertex.
   void addColorToObject(TriangleMesh *object, glm::vec3 color);
 
   // Generates a random float between 0.0 and 1.0
-  float rand01() { return (float)std::rand() / (float)RAND_MAX; }
+  static float rand01() { return (float)std::rand() / (float)RAND_MAX; }
 
   // Fills a vector of 3d vectors with count random 3d vectors
   std::vector<glm::vec3> fillRandVec3Vector(int count) {
@@ -90,6 +92,8 @@ public:
   void resize(int width, int height) override;
 
   void render_ground();
+
+  void render_ice();
 
   void setBasicShaderEnabled() {
     this->basicShadingProgram.use();

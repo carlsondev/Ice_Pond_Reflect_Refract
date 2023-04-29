@@ -51,6 +51,7 @@ void Assignment2Scene::initScene() {
 
   this->ground_plane = new Plane(100, 100, 1, 1);
   this->ground_base = new Cube(100.0f); // Scale smaller vertically
+  this->ice = new Cube(5.0f);
 
   // Add green color to ground plane
   this->addColorToObject(this->ground_plane, {0.49, 0.78, 0.47});
@@ -59,6 +60,9 @@ void Assignment2Scene::initScene() {
   this->addColorToObject(this->ground_base,
                          {78.0 / 255.0, 53.0 / 255.0, 36.0 / 255.0});
 
+  // Add blue color to ice
+  this->addColorToObject(this->ice,
+                         {102.0 / 255.0, 153.0 / 255.0, 204.0 / 255.0});
   this->basicShadingProgram.use();
   this->activeShaderProgram = &this->basicShadingProgram;
 }
@@ -101,10 +105,29 @@ void Assignment2Scene::render_ground() {
   ground_base->render();
 }
 
+void Assignment2Scene::render_ice() {
+  this->iceShadingProgram.use();
+  this->activeShaderProgram = &this->iceShadingProgram;
+
+  // Render ice
+  this->model = mat4(1.0f);
+  this->model = glm::translate(model, vec3(0.0f, 5.0f, 0.0f));
+  this->model = glm::scale(model, glm::vec3(1, 1, 1));
+
+  this->passMatrices();
+
+  MaterialProperties iceMaterialProperties{
+      {0.9f, 0.5f, 0.3f}, {0.9f, 0.5f, 0.3f}, {0.8f, 0.8f, 0.8f}, 1.0f};
+
+  ice->render();
+}
+
 void Assignment2Scene::render() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   this->render_ground();
+
+  this->render_ice();
 }
 
 void Assignment2Scene::resize(int w, int h) {
@@ -141,7 +164,7 @@ void Assignment2Scene::passMatrices() {
 }
 
 void Assignment2Scene::addColorToObject(TriangleMesh *object,
-                                        std::vector<glm::vec3> colors) {
+                                        const std::vector<glm::vec3> &colors) {
   // Convert from vec3 array to strided array
   std::vector<GLfloat> stridedColors;
   for (vec3 color : colors) {
@@ -192,10 +215,19 @@ void Assignment2Scene::compileShaderPrograms() {
   this->basicShadingProgram.compileShader("shader/basic/basic.fs",
                                           GLSLShader::FRAGMENT);
   this->basicShadingProgram.link();
+
+  this->iceShadingProgram.compileShader("shader/ice/ice.vs",
+                                        GLSLShader::VERTEX);
+  this->iceShadingProgram.compileShader("shader/ice/ice.fs",
+                                        GLSLShader::FRAGMENT);
+  this->iceShadingProgram.link();
 }
 
 Assignment2Scene::~Assignment2Scene() {
   delete this->ground_plane;
+  delete this->ground_base;
+  delete this->ice;
+
   delete this->camera;
 }
 
