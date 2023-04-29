@@ -14,6 +14,7 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/vec4.hpp>
 
+#include "cube.h"
 #include "plane.h"
 #include "teapotpatch.h"
 #include "trianglemesh.h"
@@ -37,20 +38,17 @@ private:
   GLFWwindow *currentWindow;
 
   GLSLProgram basicShadingProgram;
-  GLSLProgram wireframeShadingProgram;
-  GLSLProgram teapotShadingProgram;
 
   // The currently used shader program
   GLSLProgram *activeShaderProgram = nullptr;
 
   // Rendered objects
-  Plane *groundPlane = nullptr;
-  TeapotPatch *teapot = nullptr;
+  Plane *ground_plane = nullptr;
+  Cube *ground_base = nullptr;
 
   glm::vec2 mousePosition;
 
   float systemTime = 0;
-  bool isUsingNormalNoise = false;
 
   // Map from the object VAOs to the Color VBOs
   // Necessary because the Object VAOs are defined outside of this scope
@@ -63,11 +61,12 @@ private:
 
   void passMatrices();
 
-  void renderTeapot();
-
   // Add color to "ingredients" object using a vector of colors for every
   // vertex.
   void addColorToObject(TriangleMesh *object, std::vector<glm::vec3> colors);
+
+  // Add color to "ingredients" object using a single color for every vertex.
+  void addColorToObject(TriangleMesh *object, glm::vec3 color);
 
   // Generates a random float between 0.0 and 1.0
   float rand01() { return (float)std::rand() / (float)RAND_MAX; }
@@ -90,15 +89,11 @@ public:
   void render() override;
   void resize(int width, int height) override;
 
+  void render_ground();
+
   void setBasicShaderEnabled() {
     this->basicShadingProgram.use();
     this->activeShaderProgram = &this->basicShadingProgram;
-  }
-
-  void toggleNormalNoise() {
-    this->isUsingNormalNoise = !this->isUsingNormalNoise;
-    this->teapotShadingProgram.setUniform("UseNormalNoise",
-                                          this->isUsingNormalNoise);
   }
 
   // Called by the cursor callback

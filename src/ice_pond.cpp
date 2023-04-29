@@ -16,10 +16,6 @@ static void keyCallback(GLFWwindow *window, int key, int scancode, int action,
   }
 
   auto scene = (Assignment2Scene *)glfwGetWindowUserPointer(window);
-
-  if (key == GLFW_KEY_N) {
-    scene->toggleNormalNoise();
-  }
 }
 
 static void mousePositionCallback(GLFWwindow *window, double xpos,
@@ -53,22 +49,18 @@ void Assignment2Scene::initScene() {
 
   this->camera = new ArcballCam(2.0f, 100.0f);
 
-  this->groundPlane = new Plane(100, 100, 1, 1);
+  this->ground_plane = new Plane(100, 100, 1, 1);
+  this->ground_base = new Cube(100.0f); // Scale smaller vertically
 
-  // Add random green colors
-  std::vector<vec3> groundColors;
-  for (int i = 0; i < this->groundPlane->getNumVerts(); i++)
-    groundColors.emplace_back(0.49, 0.78, 0.47);
-  this->addColorToObject(this->groundPlane, groundColors);
+  // Add green color to ground plane
+  this->addColorToObject(this->ground_plane, {0.49, 0.78, 0.47});
 
-  this->teapot = new TeapotPatch();
+  // Add brown color to ground base
+  this->addColorToObject(this->ground_base,
+                         {78.0 / 255.0, 53.0 / 255.0, 36.0 / 255.0});
 
-  this->isUsingNormalNoise = false;
-  this->teapotShadingProgram.use();
-  this->teapotShadingProgram.setUniform("UseNormalNoise", false);
-
-  this->wireframeShadingProgram.use();
-  this->activeShaderProgram = &this->wireframeShadingProgram;
+  this->basicShadingProgram.use();
+  this->activeShaderProgram = &this->basicShadingProgram;
 }
 
 void Assignment2Scene::computeActiveMatrices() {
@@ -82,12 +74,12 @@ void Assignment2Scene::update(float t) {
   this->systemTime = t;
   this->computeActiveMatrices();
 }
-void Assignment2Scene::render() {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  this->wireframeShadingProgram.use();
-  this->activeShaderProgram = &this->wireframeShadingProgram;
+void Assignment2Scene::render_ground() {
+  this->basicShadingProgram.use();
+  this->activeShaderProgram = &this->basicShadingProgram;
 
+  // Render ground plane
   this->model = mat4(1.0f);
   this->model = glm::translate(model, vec3(0.0f, 0.0f, 0.0f));
   this->model = glm::scale(model, glm::vec3(1, 1, 1));
@@ -97,24 +89,22 @@ void Assignment2Scene::render() {
   MaterialProperties groundMaterialProperties{
       {0.9f, 0.5f, 0.3f}, {0.9f, 0.5f, 0.3f}, {0.8f, 0.8f, 0.8f}, 1.0f};
 
-  groundPlane->render();
+  ground_plane->render();
 
-  this->renderTeapot();
-}
-
-void Assignment2Scene::renderTeapot() {
-
-  this->teapotShadingProgram.use();
-  this->activeShaderProgram = &this->teapotShadingProgram;
-
+  // Render ground base
   this->model = mat4(1.0f);
-  this->model = glm::translate(model, vec3(0.0f, 8.0f, 0.0f));
-  this->model = glm::scale(model, glm::vec3(4, 4, 4));
-  this->model = glm::rotate(model, glm::radians(-90.0f), vec3(1, 0, 0));
+  this->model = glm::translate(model, vec3(0.0f, -6.0f, 0.0f));
+  this->model = glm::scale(model, glm::vec3(1, 0.1, 1));
 
   this->passMatrices();
 
-  this->teapot->render();
+  ground_base->render();
+}
+
+void Assignment2Scene::render() {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  this->render_ground();
 }
 
 void Assignment2Scene::resize(int w, int h) {
@@ -188,6 +178,13 @@ void Assignment2Scene::addColorToObject(TriangleMesh *object,
   glBindVertexArray(0);
 }
 
+void Assignment2Scene::addColorToObject(TriangleMesh *object, glm::vec3 color) {
+  std::vector<vec3> colors;
+  for (int i = 0; i < object->getNumVerts(); i++)
+    colors.emplace_back(color);
+  this->addColorToObject(object, colors);
+}
+
 void Assignment2Scene::compileShaderPrograms() {
 
   this->basicShadingProgram.compileShader("shader/basic/basic.vs",
@@ -195,32 +192,10 @@ void Assignment2Scene::compileShaderPrograms() {
   this->basicShadingProgram.compileShader("shader/basic/basic.fs",
                                           GLSLShader::FRAGMENT);
   this->basicShadingProgram.link();
-
-  this->wireframeShadingProgram.compileShader("shader/wireframe/wireframe.vs",
-                                              GLSLShader::VERTEX);
-  this->wireframeShadingProgram.compileShader("shader/wireframe/wireframe.gs",
-                                              GLSLShader::GEOMETRY);
-  this->wireframeShadingProgram.compileShader("shader/wireframe/wireframe.fs",
-                                              GLSLShader::FRAGMENT);
-  this->wireframeShadingProgram.link();
-
-  this->teapotShadingProgram.compileShader("shader/teapot/teapot.vs",
-                                           GLSLShader::VERTEX);
-  this->teapotShadingProgram.compileShader("shader/teapot/teapot.gs",
-                                           GLSLShader::GEOMETRY);
-  this->teapotShadingProgram.compileShader("shader/teapot/teapot.fs",
-                                           GLSLShader::FRAGMENT);
-  this->teapotShadingProgram.compileShader("shader/teapot/teapot.tcs",
-                                           GLSLShader::TESS_CONTROL);
-  this->teapotShadingProgram.compileShader("shader/teapot/teapot.tes",
-                                           GLSLShader::TESS_EVALUATION);
-
-  this->teapotShadingProgram.link();
 }
 
 Assignment2Scene::~Assignment2Scene() {
-  delete this->groundPlane;
-  delete this->teapot;
+  delete this->ground_plane;
   delete this->camera;
 }
 
