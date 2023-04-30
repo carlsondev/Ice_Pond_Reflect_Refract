@@ -49,7 +49,13 @@ void Assignment2Scene::initScene() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  int width, height = 0;
+
+  glfwGetWindowSize(this->currentWindow, &width, &height);
+
   this->camera = new ArcballCam(2.0f, 100.0f);
+  this->envMapFBOObject = new EnvironmentMapFBOObject(this->ice_center_loc,
+                                                      glm::vec2(width, height));
 
   this->ground_plane = new Plane(100, 100, 1, 1);
   this->ground_base = new Cube(100.0f); // Scale smaller vertically
@@ -71,7 +77,6 @@ void Assignment2Scene::initScene() {
 
 void Assignment2Scene::computeActiveMatrices() {
 
-  this->view = camera->getViewMatrix();
   this->projection = glm::perspective(glm::radians(60.0f),
                                       (float)width / height, 1.0f, 1000.0f);
 }
@@ -113,7 +118,7 @@ void Assignment2Scene::render_ice() {
 
   // Render ice
   this->model = mat4(1.0f);
-  this->model = glm::translate(model, vec3(0.0f, 5.0f, 0.0f));
+  this->model = glm::translate(model, this->ice_center_loc);
   this->model = glm::scale(model, glm::vec3(1, 1, 1));
 
   this->passMatrices();
@@ -124,12 +129,32 @@ void Assignment2Scene::render_ice() {
   ice->render();
 }
 
-void Assignment2Scene::render() {
+void Assignment2Scene::render_objects(glm::mat4 view_matrix) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  this->view = view_matrix;
 
   this->render_ground();
 
   this->render_ice();
+}
+
+void Assignment2Scene::render() {
+
+  // Render FBOs
+  this->envMapFBOObject->bindEnvFBO(POSITIVE_X);
+  this->render_objects(this->envMapFBOObject->getViewMatrix());
+  this->envMapFBOObject->bindEnvFBO(NEGATIVE_X);
+  this->render_objects(this->envMapFBOObject->getViewMatrix());
+  this->envMapFBOObject->bindEnvFBO(POSITIVE_Y);
+  this->render_objects(this->envMapFBOObject->getViewMatrix());
+  this->envMapFBOObject->bindEnvFBO(NEGATIVE_Y);
+  this->render_objects(this->envMapFBOObject->getViewMatrix());
+  this->envMapFBOObject->bindEnvFBO(POSITIVE_Z);
+  this->render_objects(this->envMapFBOObject->getViewMatrix());
+
+  this->envMapFBOObject->unbindFBO();
+  this->render_objects(this->camera->getViewMatrix());
 }
 
 void Assignment2Scene::resize(int w, int h) {
@@ -148,7 +173,7 @@ void Assignment2Scene::passMatrices() {
     return;
   }
 
-  mat4 mvMat = view * model;
+  mat4 mvMat = this->view * model;
 
   this->activeShaderProgram->setUniform("ModelMatrix", model);
   this->activeShaderProgram->setUniform("ModelViewMatrix", mvMat);
@@ -158,8 +183,7 @@ void Assignment2Scene::passMatrices() {
       glm::mat3(vec3(mvMat[0]), vec3(mvMat[1]), vec3(mvMat[2])));
   this->activeShaderProgram->setUniform("MVP", projection * mvMat);
 
-  this->activeShaderProgram->setUniform("ViewportMatrix",
-                                        this->camera->getViewMatrix());
+  this->activeShaderProgram->setUniform("ViewportMatrix", this->view);
 
   this->activeShaderProgram->setUniform("TessLevel", 10);
   this->activeShaderProgram->setUniform("LineWidth", 0.5f);

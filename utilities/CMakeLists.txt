@@ -2,7 +2,7 @@ set(target utilities)
 
 set(utilities_SOURCES
         ArcballCam.hpp
-        Camera.hpp)
+        Camera.hpp BasicCamera.hpp)
 
 add_library(${target} STATIC ${utilities_SOURCES})
 

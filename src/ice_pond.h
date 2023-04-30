@@ -20,6 +20,7 @@
 #include "trianglemesh.h"
 
 #include "ArcballCam.hpp"
+#include "env_fbo_object.h"
 
 struct MaterialProperties {
   glm::vec3 ambientReflectivity;
@@ -65,7 +66,8 @@ private:
 
   // Add color to "ingredients" object using a vector of colors for every
   // vertex.
-  void addColorToObject(TriangleMesh *object, const std::vector<glm::vec3>& colors);
+  void addColorToObject(TriangleMesh *object,
+                        const std::vector<glm::vec3> &colors);
 
   // Add color to "ingredients" object using a single color for every vertex.
   void addColorToObject(TriangleMesh *object, glm::vec3 color);
@@ -85,15 +87,20 @@ public:
   explicit Assignment2Scene(GLFWwindow *window);
 
   ArcballCam *camera = nullptr;
+  EnvironmentMapFBOObject *envMapFBOObject = nullptr;
 
   void initScene() override;
   void update(float t) override;
   void render() override;
   void resize(int width, int height) override;
 
+  void render_objects(glm::mat4 viewMatrix);
+
   void render_ground();
 
   void render_ice();
+
+  glm::vec3 ice_center_loc = {0.0, 5.0, 0.0};
 
   void setBasicShaderEnabled() {
     this->basicShadingProgram.use();
