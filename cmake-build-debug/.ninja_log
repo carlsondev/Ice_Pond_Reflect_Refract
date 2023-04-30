@@ -1,5 +1,5 @@
 # ninja log v5
-5	1961	7045138358117666	src/CMakeFiles/ice_pond.dir/ice_pond.cpp.obj	740d26318adadded
+4	1987	7045193327168441	src/CMakeFiles/ice_pond.dir/ice_pond.cpp.obj	740d26318adadded
 9	1931	7045138357837057	src/CMakeFiles/ice_pond.dir/main.cpp.obj	f7292cd1aa31776c
 1723	3074	7034706077698967	ingredients/CMakeFiles/ingredients.dir/skybox.cpp.obj	95898b71a26dfa93
 37	1722	7034706064164174	ingredients/CMakeFiles/ingredients.dir/trianglemesh.cpp.obj	fc49c5b47b8b9cd1
@@ -27,4 +27,4 @@
 4	1905	7021175172430568	Assignment_2/CMakeFiles/bperkins_A2.dir/main.cpp.obj	6c89b36d804f474f
 4	1999	7021178223837333	Assignment_2/CMakeFiles/bperkins_A2.dir/assignment2.cpp.obj	3f1d81d8bfd281f2
 2000	2591	7021178229692814	Assignment_2/bperkins_A2.exe	ee03627e3063c5f4
-1961	2589	7045138364340888	src/ice_pond.exe	f5e2183857d59c6e
+1987	2578	7045193333014028	src/ice_pond.exe	f5e2183857d59c6e
