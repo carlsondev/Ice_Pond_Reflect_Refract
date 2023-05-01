@@ -22,36 +22,7 @@ EnvironmentMapFBOObject::EnvironmentMapFBOObject(glm::vec3 position,
   this->internal_camera->setPosition(position);
 }
 
-/*
- *switch (direction) {
-case POSITIVE_X:
-  this->internal_camera->setTheta(glm::half_pi<GLfloat>());
-  this->internal_camera->setPhi(glm::half_pi<GLfloat>());
-  break;
-case NEGATIVE_X:
-  this->internal_camera->setTheta(glm::half_pi<GLfloat>());
-  this->internal_camera->setPhi(-glm::half_pi<GLfloat>());
-  break;
-case POSITIVE_Y:
-  this->internal_camera->setTheta(glm::pi<GLfloat>()); // Maybe
-  this->internal_camera->setPhi(0);
-  break;
-case NEGATIVE_Y:
-  this->internal_camera->setTheta(0); // Maybe
-  this->internal_camera->setPhi(glm::pi<GLfloat>());
-  break;
-case POSITIVE_Z:
-  this->internal_camera->setTheta(glm::half_pi<GLfloat>());
-  this->internal_camera->setPhi(glm::pi<GLfloat>());
-  break;
-case NEGATIVE_Z:
-  this->internal_camera->setTheta(glm::half_pi<GLfloat>());
-  this->internal_camera->setPhi(0);
-  break;
-}
- */
-
-void EnvironmentMapFBOObject::bindEnvFBO(DIRECTION direction) {
+void EnvironmentMapFBOObject::bindFBO(DIRECTION direction, bool bind_norm) {
 
   if (direction == POSITIVE_Y) {
     // Set up vector to look at vertical points
@@ -90,62 +61,73 @@ void EnvironmentMapFBOObject::bindEnvFBO(DIRECTION direction) {
     break;
   }
 
-  //  switch (direction) {
-  //  case POSITIVE_X:
-  //    this->internal_camera->setTheta(glm::half_pi<GLfloat>());
-  //    this->internal_camera->setPhi(glm::half_pi<GLfloat>());
-  //    break;
-  //  case NEGATIVE_X:
-  //    this->internal_camera->setTheta(glm::half_pi<GLfloat>());
-  //    this->internal_camera->setPhi(-glm::half_pi<GLfloat>());
-  //    break;
-  //  case POSITIVE_Y:
-  //    this->internal_camera->setTheta(glm::pi<GLfloat>()); // Maybe
-  //    this->internal_camera->setPhi(0);
-  //    break;
-  //  case NEGATIVE_Y:
-  //    this->internal_camera->setTheta(0); // Maybe
-  //    this->internal_camera->setPhi(glm::pi<GLfloat>());
-  //    break;
-  //  case POSITIVE_Z:
-  //    this->internal_camera->setTheta(glm::half_pi<GLfloat>());
-  //    this->internal_camera->setPhi(glm::pi<GLfloat>());
-  //    break;
-  //  case NEGATIVE_Z:
-  //    this->internal_camera->setTheta(glm::half_pi<GLfloat>());
-  //    this->internal_camera->setPhi(0);
-  //    break;
-  //  }
   this->internal_camera->recomputeOrientation();
 
-  // Bind texture
-  // Assumes uniforms for images are texture_posx = 0, texture_negx = 1, etc.
-  glActiveTexture(GL_TEXTURE0 + direction);
-  glBindTexture(GL_TEXTURE_2D, fboTextureArray[direction]);
+  if (bind_norm) {
+    // Bind normal texture
+    // Assumes uniforms for images are texture_posx = 0, texture_negx = 1, etc.
+    glActiveTexture(GL_TEXTURE0 + this->normTexIDForDir(direction));
+    glBindTexture(GL_TEXTURE_2D, fboNormalTextureArray[direction]);
 
-  // bind FBO
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboArray[direction]);
-  glDrawBuffer(GL_COLOR_ATTACHMENT0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboArray[direction]);
+    GLuint drawBuffers[2] = {GL_NONE, GL_COLOR_ATTACHMENT1};
+
+    glDrawBuffers(2, drawBuffers);
+
+  } else {
+    // Bind env texture
+    // Assumes uniforms for images are texture_posx = 0, texture_negx = 1, etc.
+    glActiveTexture(GL_TEXTURE0 + direction);
+    glBindTexture(GL_TEXTURE_2D, fboEnvTextureArray[direction]);
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboArray[direction]);
+    GLuint drawBuffers[2] = {GL_COLOR_ATTACHMENT0, GL_NONE};
+
+    glDrawBuffers(2, drawBuffers);
+  }
+
+
 }
 
 void EnvironmentMapFBOObject::bindAllFBOTextures() {
+
+  // Bind all env textures
   glActiveTexture(GL_TEXTURE0 + POSITIVE_X);
-  glBindTexture(GL_TEXTURE_2D, fboTextureArray[POSITIVE_X]);
+  glBindTexture(GL_TEXTURE_2D, fboEnvTextureArray[POSITIVE_X]);
 
   glActiveTexture(GL_TEXTURE0 + NEGATIVE_X);
-  glBindTexture(GL_TEXTURE_2D, fboTextureArray[NEGATIVE_X]);
+  glBindTexture(GL_TEXTURE_2D, fboEnvTextureArray[NEGATIVE_X]);
 
   glActiveTexture(GL_TEXTURE0 + POSITIVE_Y);
-  glBindTexture(GL_TEXTURE_2D, fboTextureArray[POSITIVE_Y]);
+  glBindTexture(GL_TEXTURE_2D, fboEnvTextureArray[POSITIVE_Y]);
 
   glActiveTexture(GL_TEXTURE0 + NEGATIVE_Y);
-  glBindTexture(GL_TEXTURE_2D, fboTextureArray[NEGATIVE_Y]);
+  glBindTexture(GL_TEXTURE_2D, fboEnvTextureArray[NEGATIVE_Y]);
 
   glActiveTexture(GL_TEXTURE0 + POSITIVE_Z);
-  glBindTexture(GL_TEXTURE_2D, fboTextureArray[POSITIVE_Z]);
+  glBindTexture(GL_TEXTURE_2D, fboEnvTextureArray[POSITIVE_Z]);
 
   glActiveTexture(GL_TEXTURE0 + NEGATIVE_Z);
-  glBindTexture(GL_TEXTURE_2D, fboTextureArray[NEGATIVE_Z]);
+  glBindTexture(GL_TEXTURE_2D, fboEnvTextureArray[NEGATIVE_Z]);
+
+  // Bind all normal textures
+  glActiveTexture(GL_TEXTURE0 + this->normTexIDForDir(POSITIVE_X));
+  glBindTexture(GL_TEXTURE_2D, fboNormalTextureArray[POSITIVE_X]);
+
+  glActiveTexture(GL_TEXTURE0 + this->normTexIDForDir(NEGATIVE_X));
+  glBindTexture(GL_TEXTURE_2D, fboNormalTextureArray[NEGATIVE_X]);
+
+  glActiveTexture(GL_TEXTURE0 + this->normTexIDForDir(POSITIVE_Y));
+  glBindTexture(GL_TEXTURE_2D, fboNormalTextureArray[POSITIVE_Y]);
+
+  glActiveTexture(GL_TEXTURE0 + this->normTexIDForDir(NEGATIVE_Y));
+  glBindTexture(GL_TEXTURE_2D, fboNormalTextureArray[NEGATIVE_Y]);
+
+  glActiveTexture(GL_TEXTURE0 + this->normTexIDForDir(POSITIVE_Z));
+  glBindTexture(GL_TEXTURE_2D, fboNormalTextureArray[POSITIVE_Z]);
+
+  glActiveTexture(GL_TEXTURE0 + this->normTexIDForDir(NEGATIVE_Z));
+  glBindTexture(GL_TEXTURE_2D, fboNormalTextureArray[NEGATIVE_Z]);
 }
 
 void EnvironmentMapFBOObject::generateFBO(DIRECTION direction) {
@@ -160,10 +142,10 @@ void EnvironmentMapFBOObject::generateFBO(DIRECTION direction) {
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32,
                         this->windowDims.x, this->windowDims.y);
 
-  // Generate texture
+  // Generate env texture
   glActiveTexture(GL_TEXTURE0 + direction);
-  glGenTextures(1, &fboTextureArray[direction]);
-  glBindTexture(GL_TEXTURE_2D, fboTextureArray[direction]);
+  glGenTextures(1, &fboEnvTextureArray[direction]);
+  glBindTexture(GL_TEXTURE_2D, fboEnvTextureArray[direction]);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -172,9 +154,21 @@ void EnvironmentMapFBOObject::generateFBO(DIRECTION direction) {
   glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, this->windowDims.x,
                  this->windowDims.y);
 
-  // Attach texture to FBO
+  // Generate normal texture
+  glActiveTexture(GL_TEXTURE0 + this->normTexIDForDir(direction));
+  glGenTextures(1, &fboNormalTextureArray[direction]);
+  glBindTexture(GL_TEXTURE_2D, fboNormalTextureArray[direction]);
+
+  glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, this->windowDims.x,
+                 this->windowDims.y);
+
+  // Attach env texture to FBO
   glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                         GL_TEXTURE_2D, fboTextureArray[direction], 0);
+                         GL_TEXTURE_2D, fboEnvTextureArray[direction], 0);
+
+  // Attach normal texture to FBO
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1,
+                         GL_TEXTURE_2D, fboNormalTextureArray[direction], 0);
 
   // Attach render buffer to FBO
   glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
@@ -194,7 +188,8 @@ EnvironmentMapFBOObject::~EnvironmentMapFBOObject() {
   for (int i = 0; i < 6; i++) {
     glDeleteFramebuffers(1, &fboArray[i]);
     glDeleteRenderbuffers(1, &fboRBArray[i]);
-    glDeleteTextures(1, &fboTextureArray[i]);
+    glDeleteTextures(1, &fboEnvTextureArray[i]);
+    glDeleteTextures(1, &fboNormalTextureArray[i]);
   }
 
   delete this->internal_camera;

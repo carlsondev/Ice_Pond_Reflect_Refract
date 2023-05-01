@@ -27,7 +27,7 @@ public:
 
   ~EnvironmentMapFBOObject();
 
-  void bindEnvFBO(DIRECTION direction);
+  void bindFBO(DIRECTION direction, bool bind_norm);
 
   void bindAllFBOTextures();
 
@@ -44,10 +44,16 @@ public:
   glm::mat4 getViewMatrix() { return this->internal_camera->getViewMatrix(); }
   BasicCamera *internal_camera;
 
+  // Offset past the existing env textures
+  int normTexIDForDir(DIRECTION direction) {
+    return direction + NEGATIVE_Z + 1;
+  }
+
 private:
   GLuint fboArray[6];
-  GLuint fboTextureArray[6];
+  GLuint fboEnvTextureArray[6];
   GLuint fboRBArray[6];
+  GLuint fboNormalTextureArray[6];
   glm::vec2 windowDims;
   glm::vec3 object_position;
 

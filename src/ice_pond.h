@@ -50,7 +50,8 @@ private:
   Cube *ice = nullptr;
   Cube *test_block = nullptr;
 
-  glm::vec2 mousePosition;
+  glm::vec2 mousePosition = {0, 0};
+  glm::vec2 windowDimensions;
 
   float systemTime = 0;
 
@@ -95,7 +96,8 @@ public:
   void render() override;
   void resize(int width, int height) override;
 
-  void render_objects(glm::mat4 viewMatrix, bool do_render_ice = true);
+  void render_objects(glm::mat4 viewMatrix, bool do_render_ice = true,
+                      bool do_render_ice_fbo = false);
 
   void render_ground();
 
@@ -103,7 +105,7 @@ public:
 
   glm::vec3 ice_center_loc = {0.0, 3.0, 0.0};
 
-  void shiftIcePosition(glm::vec3 delta){
+  void shiftIcePosition(glm::vec3 delta) {
     this->ice_center_loc += delta;
     if (this->envMapFBOObject != nullptr)
       this->envMapFBOObject->setObjectPosition(this->ice_center_loc);
