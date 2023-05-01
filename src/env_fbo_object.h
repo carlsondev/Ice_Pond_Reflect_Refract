@@ -29,17 +29,27 @@ public:
 
   void bindEnvFBO(DIRECTION direction);
 
-  inline void unbindFBO() { glBindFramebuffer(GL_FRAMEBUFFER, 0); }
+  void bindAllFBOTextures();
+
+  inline void unbindFBO() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDrawBuffer(GL_BACK_LEFT);
+  }
+
+  inline void setObjectPosition(glm::vec3 position) {
+    this->object_position = position;
+    this->internal_camera->setPosition(position);
+  }
 
   glm::mat4 getViewMatrix() { return this->internal_camera->getViewMatrix(); }
+  BasicCamera *internal_camera;
 
 private:
   GLuint fboArray[6];
   GLuint fboTextureArray[6];
+  GLuint fboRBArray[6];
   glm::vec2 windowDims;
   glm::vec3 object_position;
-
-  BasicCamera *internal_camera;
 
   void generateFBO(DIRECTION direction);
 };

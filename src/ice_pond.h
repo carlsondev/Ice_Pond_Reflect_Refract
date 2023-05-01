@@ -48,6 +48,7 @@ private:
   Cube *ground_base = nullptr;
 
   Cube *ice = nullptr;
+  Cube *test_block = nullptr;
 
   glm::vec2 mousePosition;
 
@@ -94,17 +95,18 @@ public:
   void render() override;
   void resize(int width, int height) override;
 
-  void render_objects(glm::mat4 viewMatrix);
+  void render_objects(glm::mat4 viewMatrix, bool do_render_ice = true);
 
   void render_ground();
 
   void render_ice();
 
-  glm::vec3 ice_center_loc = {0.0, 5.0, 0.0};
+  glm::vec3 ice_center_loc = {0.0, 3.0, 0.0};
 
-  void setBasicShaderEnabled() {
-    this->basicShadingProgram.use();
-    this->activeShaderProgram = &this->basicShadingProgram;
+  void shiftIcePosition(glm::vec3 delta){
+    this->ice_center_loc += delta;
+    if (this->envMapFBOObject != nullptr)
+      this->envMapFBOObject->setObjectPosition(this->ice_center_loc);
   }
 
   // Called by the cursor callback

@@ -11,11 +11,34 @@ using namespace glm;
 
 static void keyCallback(GLFWwindow *window, int key, int scancode, int action,
                         int mods) {
-  if (action != GLFW_RELEASE) {
+  if (action != GLFW_REPEAT) {
     return;
   }
 
   auto scene = (Assignment2Scene *)glfwGetWindowUserPointer(window);
+  float iceSpeed = 0.1f;
+  switch (key) {
+  case GLFW_KEY_UP:
+    scene->shiftIcePosition(vec3(0, iceSpeed, 0));
+    break;
+  case GLFW_KEY_DOWN:
+    scene->shiftIcePosition(vec3(0, -iceSpeed, 0));
+    break;
+  case GLFW_KEY_LEFT:
+    scene->shiftIcePosition(vec3(-iceSpeed, 0, 0));
+    break;
+  case GLFW_KEY_RIGHT:
+    scene->shiftIcePosition(vec3(iceSpeed, 0, 0));
+    break;
+  case GLFW_KEY_W:
+    scene->shiftIcePosition(vec3(0, 0, -iceSpeed));
+    break;
+  case GLFW_KEY_S:
+    scene->shiftIcePosition(vec3(0, 0, iceSpeed));
+    break;
+  default:
+    break;
+  }
 }
 
 static void mousePositionCallback(GLFWwindow *window, double xpos,
@@ -45,9 +68,9 @@ Assignment2Scene::Assignment2Scene(GLFWwindow *window) {
 void Assignment2Scene::initScene() {
   this->compileShaderPrograms();
 
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  // glEnable(GL_DEPTH_TEST);
+  //   glEnable(GL_BLEND);
+  //   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   int width, height = 0;
 
@@ -62,7 +85,11 @@ void Assignment2Scene::initScene() {
   this->ice = new Cube(5.0f);
 
   // Add green color to ground plane
-  this->addColorToObject(this->ground_plane, {0.49, 0.78, 0.47});
+  // this->addColorToObject(this->ground_plane, {0.49, 0.78, 0.47});
+
+  this->addColorToObject(
+      this->ground_plane,
+      this->fillRandVec3Vector(this->ground_plane->getNumVerts()));
 
   // Add brown color to ground base
   this->addColorToObject(this->ground_base,
@@ -115,6 +142,7 @@ void Assignment2Scene::render_ground() {
 void Assignment2Scene::render_ice() {
   this->iceShadingProgram.use();
   this->activeShaderProgram = &this->iceShadingProgram;
+  this->envMapFBOObject->bindAllFBOTextures();
 
   // Render ice
   this->model = mat4(1.0f);
@@ -123,38 +151,53 @@ void Assignment2Scene::render_ice() {
 
   this->passMatrices();
 
+  // Setup FBO Texture Uniforms
+  this->activeShaderProgram->setUniform("posX", POSITIVE_X);
+  this->activeShaderProgram->setUniform("negX", NEGATIVE_X);
+  this->activeShaderProgram->setUniform("posY", POSITIVE_Y);
+  this->activeShaderProgram->setUniform("negY", NEGATIVE_Y);
+  this->activeShaderProgram->setUniform("posZ", POSITIVE_Z);
+  this->activeShaderProgram->setUniform("negZ", NEGATIVE_Z);
+
   MaterialProperties iceMaterialProperties{
       {0.9f, 0.5f, 0.3f}, {0.9f, 0.5f, 0.3f}, {0.8f, 0.8f, 0.8f}, 1.0f};
 
   ice->render();
 }
 
-void Assignment2Scene::render_objects(glm::mat4 view_matrix) {
+void Assignment2Scene::render_objects(glm::mat4 view_matrix,
+                                      bool do_render_ice) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   this->view = view_matrix;
 
   this->render_ground();
 
-  this->render_ice();
+  if (do_render_ice) {
+    this->render_ice();
+  }
 }
 
 void Assignment2Scene::render() {
 
   // Render FBOs
+  glEnable(GL_DEPTH_TEST);
   this->envMapFBOObject->bindEnvFBO(POSITIVE_X);
-  this->render_objects(this->envMapFBOObject->getViewMatrix());
+  this->render_objects(this->envMapFBOObject->getViewMatrix(), false);
   this->envMapFBOObject->bindEnvFBO(NEGATIVE_X);
-  this->render_objects(this->envMapFBOObject->getViewMatrix());
+  this->render_objects(this->envMapFBOObject->getViewMatrix(), false);
   this->envMapFBOObject->bindEnvFBO(POSITIVE_Y);
-  this->render_objects(this->envMapFBOObject->getViewMatrix());
+  this->render_objects(this->envMapFBOObject->getViewMatrix(), false);
   this->envMapFBOObject->bindEnvFBO(NEGATIVE_Y);
-  this->render_objects(this->envMapFBOObject->getViewMatrix());
+  this->render_objects(this->envMapFBOObject->getViewMatrix(), false);
   this->envMapFBOObject->bindEnvFBO(POSITIVE_Z);
-  this->render_objects(this->envMapFBOObject->getViewMatrix());
+  this->render_objects(this->envMapFBOObject->getViewMatrix(), false);
+  this->envMapFBOObject->bindEnvFBO(NEGATIVE_Z);
+  this->render_objects(this->envMapFBOObject->getViewMatrix(), false);
 
   this->envMapFBOObject->unbindFBO();
-  this->render_objects(this->camera->getViewMatrix());
+
+  this->render_objects(this->camera->getViewMatrix(), true);
 }
 
 void Assignment2Scene::resize(int w, int h) {
@@ -174,19 +217,17 @@ void Assignment2Scene::passMatrices() {
   }
 
   mat4 mvMat = this->view * model;
+  mat4 normalMat4 = glm::transpose(glm::inverse(model));
+  mat3 normalMatrix =
+      mat3(vec3(normalMat4[0]), vec3(normalMat4[1]), vec3(normalMat4[2]));
 
   this->activeShaderProgram->setUniform("ModelMatrix", model);
   this->activeShaderProgram->setUniform("ModelViewMatrix", mvMat);
   this->activeShaderProgram->setUniform("ProjectionMatrix", projection);
-  this->activeShaderProgram->setUniform(
-      "NormalMatrix",
-      glm::mat3(vec3(mvMat[0]), vec3(mvMat[1]), vec3(mvMat[2])));
+  this->activeShaderProgram->setUniform("NormalMatrix", normalMatrix);
   this->activeShaderProgram->setUniform("MVP", projection * mvMat);
 
   this->activeShaderProgram->setUniform("ViewportMatrix", this->view);
-
-  this->activeShaderProgram->setUniform("TessLevel", 10);
-  this->activeShaderProgram->setUniform("LineWidth", 0.5f);
 }
 
 void Assignment2Scene::addColorToObject(TriangleMesh *object,
@@ -255,16 +296,21 @@ Assignment2Scene::~Assignment2Scene() {
   delete this->ice;
 
   delete this->camera;
+  delete this->envMapFBOObject;
 }
 
 void Assignment2Scene::handleCursorPositionEvent(glm::vec2 cursorPosition) {
 
   // if mouse hasn't moved in the window, prevent camera from flipping out
   if (std::fabs(mousePosition.x - MOUSE_UNINITIALIZED) <= 0.000001f) {
+    printf("Initializing mouse position\n");
+    printf("Cursor position: %f, %f\n", cursorPosition.x, cursorPosition.y);
+
     mousePosition = cursorPosition;
   }
-  this->camera->rotate((cursorPosition.x - mousePosition.x) * 0.005f,
-                       (cursorPosition.y - mousePosition.y) * 0.005f);
-
+  float dTheta = (cursorPosition.x - mousePosition.x) * 0.005f;
+  float dPhi = (cursorPosition.y - mousePosition.y) * 0.005f;
+  this->camera->rotate(dTheta, dPhi);
+  printf("dTheta: %f, dPhi: %f\n", dTheta, dPhi);
   this->mousePosition = cursorPosition;
 }

@@ -51,7 +51,11 @@ inline void ArcballCam::recomputeOrientation() {
   _direction.x = sinf(_theta) * sinf(_phi) * _radius;
   _direction.y = -cosf(_phi) * _radius;
   _direction.z = -cosf(_theta) * sinf(_phi) * _radius;
-  
+
+  printf("Arcball Direction (%f, %f, %f)\n", _direction.x, _direction.y,
+         _direction.z);
+  printf("Theta %f, Phi %f, Radius %f\n", _theta, _phi, _radius);
+
   _updateFreeCameraViewMatrix();
 }
 
