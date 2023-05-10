@@ -7,6 +7,8 @@
 
 # Compilation
 CMakeLists.txt
+build/*
+build
 
 # User-specific stuff
 .idea/**/workspace.xml
