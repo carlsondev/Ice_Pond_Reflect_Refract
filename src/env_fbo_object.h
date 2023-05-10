@@ -27,11 +27,11 @@ public:
 
   ~EnvironmentMapFBOObject();
 
-  void bindFBO(DIRECTION direction, bool bind_norm);
+  void bindCubeMapFBO(DIRECTION direction, bool bind_norm);
 
-  void bindAllFBOTextures();
+  void bindCubeMapTexture();
 
-  inline void unbindFBO() {
+  inline void unbindCubeMapFBO() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glDrawBuffer(GL_BACK_LEFT);
   }
@@ -42,22 +42,24 @@ public:
   }
 
   glm::mat4 getViewMatrix() { return this->internal_camera->getViewMatrix(); }
+  glm::mat4 getProjectionMatrix() {
+    return this->internal_camera->getProjectionMatrix();
+  }
   BasicCamera *internal_camera;
 
-  // Offset past the existing env textures
-  int normTexIDForDir(DIRECTION direction) {
-    return direction + NEGATIVE_Z + 1;
-  }
-
 private:
-  GLuint fboArray[6];
-  GLuint fboEnvTextureArray[6];
-  GLuint fboRBArray[6];
   GLuint fboNormalTextureArray[6];
-  glm::vec2 windowDims;
   glm::vec3 object_position;
 
-  void generateFBO(DIRECTION direction);
+  GLuint cubeMapTexture;
+  GLuint cubeMapFBO;
+  GLuint renderBuffer;
+
+  const int CUBE_MAP_WIDTH = 256;
+
+  void rotateCameraToDirection(DIRECTION direction);
+
+  void generateCubeMapFBO();
 };
 
 #endif // ICE_POND_ENV_FBO_OBJECT_H

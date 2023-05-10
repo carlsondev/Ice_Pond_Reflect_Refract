@@ -53,6 +53,8 @@ private:
   glm::vec2 mousePosition = {0, 0};
   glm::vec2 windowDimensions;
 
+  glm::mat4 main_projection;
+
   float systemTime = 0;
 
   // Map from the object VAOs to the Color VBOs

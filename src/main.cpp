@@ -12,7 +12,7 @@
 int main(int argc, char *argv[]) {
   printf("Hello World!\n");
 
-  SceneRunner runner("Ice Pond", 1080, 1920);
+  SceneRunner runner("Ice Pond", 1920, 3413);
 
   std::unique_ptr<Scene> scene(new Assignment2Scene(runner.window));
   return runner.run(std::move(scene));
