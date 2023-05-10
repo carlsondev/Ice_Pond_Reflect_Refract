@@ -20,6 +20,7 @@
 #include "trianglemesh.h"
 
 #include "ArcballCam.hpp"
+#include "env_fbo_object.h"
 
 struct MaterialProperties {
   glm::vec3 ambientReflectivity;
@@ -47,8 +48,10 @@ private:
   Cube *ground_base = nullptr;
 
   Cube *ice = nullptr;
+  Cube *test_block = nullptr;
 
-  glm::vec2 mousePosition;
+  glm::vec2 mousePosition = {0, 0};
+  glm::vec2 windowDimensions;
 
   float systemTime = 0;
 
@@ -65,7 +68,8 @@ private:
 
   // Add color to "ingredients" object using a vector of colors for every
   // vertex.
-  void addColorToObject(TriangleMesh *object, const std::vector<glm::vec3>& colors);
+  void addColorToObject(TriangleMesh *object,
+                        const std::vector<glm::vec3> &colors);
 
   // Add color to "ingredients" object using a single color for every vertex.
   void addColorToObject(TriangleMesh *object, glm::vec3 color);
@@ -85,19 +89,26 @@ public:
   explicit Assignment2Scene(GLFWwindow *window);
 
   ArcballCam *camera = nullptr;
+  EnvironmentMapFBOObject *envMapFBOObject = nullptr;
 
   void initScene() override;
   void update(float t) override;
   void render() override;
   void resize(int width, int height) override;
 
+  void render_objects(glm::mat4 viewMatrix, bool do_render_ice = true,
+                      bool do_render_ice_fbo = false);
+
   void render_ground();
 
   void render_ice();
 
-  void setBasicShaderEnabled() {
-    this->basicShadingProgram.use();
-    this->activeShaderProgram = &this->basicShadingProgram;
+  glm::vec3 ice_center_loc = {0.0, 3.0, 0.0};
+
+  void shiftIcePosition(glm::vec3 delta) {
+    this->ice_center_loc += delta;
+    if (this->envMapFBOObject != nullptr)
+      this->envMapFBOObject->setObjectPosition(this->ice_center_loc);
   }
 
   // Called by the cursor callback
