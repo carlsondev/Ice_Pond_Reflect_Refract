@@ -1,6 +1,6 @@
 # ninja log v5
-5	2053	7046158363562142	src/CMakeFiles/ice_pond.dir/ice_pond.cpp.obj	740d26318adadded
-5	2159	7046153974339947	src/CMakeFiles/ice_pond.dir/main.cpp.obj	f7292cd1aa31776c
+5	2184	7053836813845273	src/CMakeFiles/ice_pond.dir/ice_pond.cpp.obj	740d26318adadded
+10	1271	7053836804729644	src/CMakeFiles/ice_pond.dir/main.cpp.obj	f7292cd1aa31776c
 1723	3074	7034706077698967	ingredients/CMakeFiles/ingredients.dir/skybox.cpp.obj	95898b71a26dfa93
 37	1722	7034706064164174	ingredients/CMakeFiles/ingredients.dir/trianglemesh.cpp.obj	fc49c5b47b8b9cd1
 16	1940	7034706066339352	ingredients/CMakeFiles/ingredients.dir/torus.cpp.obj	a09ecbed79f0f932
@@ -27,5 +27,5 @@
 4	1905	7021175172430568	Assignment_2/CMakeFiles/bperkins_A2.dir/main.cpp.obj	6c89b36d804f474f
 4	1999	7021178223837333	Assignment_2/CMakeFiles/bperkins_A2.dir/assignment2.cpp.obj	3f1d81d8bfd281f2
 2000	2591	7021178229692814	Assignment_2/bperkins_A2.exe	ee03627e3063c5f4
-2054	2654	7046158369508898	src/ice_pond.exe	94154afdaa234c81
-5	1825	7046157770006825	src/CMakeFiles/ice_pond.dir/env_fbo_object.cpp.obj	e3810ffc3a8d117e
+2185	2835	7053836820298021	src/ice_pond.exe	94154afdaa234c81
+13	1783	7053836809845964	src/CMakeFiles/ice_pond.dir/env_fbo_object.cpp.obj	e3810ffc3a8d117e

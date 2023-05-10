@@ -19,14 +19,12 @@ public:
     _direction.y = -cosf(_phi) * _radius;
     _direction.z = -cosf(_theta) * sinf(_phi) * _radius;
 
-    //    printf("Direction (%f, %f, %f)\n", _direction.x, _direction.y,
-    //           _direction.z);
-    //    printf("Position (%f, %f, %f)\n", _position.x, _position.y,
-    //    _position.z); printf("LookAt (%f, %f, %f)\n", _lookAtPoint.x,
-    //    _lookAtPoint.y,
-    //           _lookAtPoint.z);
-
     _updateFreeCameraViewMatrix();
+  }
+
+  glm::mat4 getProjectionMatrix(){
+    float aspect_ratio = 1.0;
+    return glm::perspective(glm::radians(90.0f), aspect_ratio, 0.3f, 100.0f);
   }
 
 private:
