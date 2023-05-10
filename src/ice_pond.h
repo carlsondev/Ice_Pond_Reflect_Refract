@@ -17,6 +17,7 @@
 #include "cube.h"
 #include "plane.h"
 #include "teapotpatch.h"
+#include "torus.h"
 #include "trianglemesh.h"
 
 #include "ArcballCam.hpp"
@@ -29,7 +30,7 @@ struct MaterialProperties {
   float shininess;
 };
 
-class Assignment2Scene : public Scene {
+class IcePond : public Scene {
 
   // value off-screen to represent mouse has not begun interacting with
   // window yet
@@ -47,7 +48,8 @@ private:
   Plane *ground_plane = nullptr;
   Cube *ground_base = nullptr;
 
-  Cube *ice = nullptr;
+  Cube *iceCube = nullptr;
+  Torus *iceTorus = nullptr;
 
   glm::vec2 mousePosition = {0, 0};
   glm::vec2 windowDimensions;
@@ -87,7 +89,7 @@ private:
   }
 
 public:
-  explicit Assignment2Scene(GLFWwindow *window);
+  explicit IcePond(GLFWwindow *window);
 
   ArcballCam *camera = nullptr;
   EnvironmentMapFBOObject *envMapFBOObject = nullptr;
@@ -115,7 +117,7 @@ public:
   // Called by the cursor callback
   void handleCursorPositionEvent(glm::vec2 cursorPosition);
 
-  ~Assignment2Scene() override;
+  ~IcePond() override;
 };
 
 #endif // ASSIGNMENT_1_ASSIGNMENT1_H

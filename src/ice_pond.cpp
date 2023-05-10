@@ -7,7 +7,7 @@
 using namespace glm;
 
 // START OF RENDERING FUNCTIONS
-void Assignment2Scene::render_ground() {
+void IcePond::render_ground() {
 
   // Render ground plane
   this->model = mat4(1.0f);
@@ -31,7 +31,7 @@ void Assignment2Scene::render_ground() {
   ground_base->render();
 }
 
-void Assignment2Scene::render_ice() {
+void IcePond::render_ice() {
 
   // Render ice
   this->model = mat4(1.0f);
@@ -46,11 +46,11 @@ void Assignment2Scene::render_ice() {
   MaterialProperties iceMaterialProperties{
       {0.9f, 0.5f, 0.3f}, {0.9f, 0.5f, 0.3f}, {0.8f, 0.8f, 0.8f}, 1.0f};
 
-  ice->render();
+  iceTorus->render();
 }
 
-void Assignment2Scene::render_objects(glm::mat4 view_matrix, bool do_render_ice,
-                                      bool do_render_ice_fbo) {
+void IcePond::render_objects(glm::mat4 view_matrix, bool do_render_ice,
+                             bool do_render_ice_fbo) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   this->basicShadingProgram.use();
@@ -69,7 +69,7 @@ void Assignment2Scene::render_objects(glm::mat4 view_matrix, bool do_render_ice,
     this->render_ice();
 }
 
-void Assignment2Scene::render() {
+void IcePond::render() {
 
   // Render FBOs
   glEnable(GL_DEPTH_TEST);

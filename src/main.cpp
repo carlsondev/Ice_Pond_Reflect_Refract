@@ -14,6 +14,6 @@ int main(int argc, char *argv[]) {
 
   SceneRunner runner("Ice Pond", 1920, 3413);
 
-  std::unique_ptr<Scene> scene(new Assignment2Scene(runner.window));
+  std::unique_ptr<Scene> scene(new IcePond(runner.window));
   return runner.run(std::move(scene));
 }

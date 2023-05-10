@@ -2,7 +2,7 @@
 # Paper Tasks
 
 * The EM (environment mapping) texture is updated by rendering the entire scene six times with a field of view set to 90°,
-  rotating the camera to point in all six directions from the centre of the ice object.
+  rotating the camera to point in all six directions from the centre of the iceCube object.
 
 
 $$ n_r = n_f (1-a) - n_b (a) $$
@@ -16,7 +16,7 @@ $$ r_{\rm refr} = eta \cdot e - (eta(n_r \cdot e) + \sqrt{1 - eta^2(1 - (n_r \cd
 * $r_{\rm refr}$ is the refracted eye vector
 * $eta$ is the refraction index of the media we are travelling
   from divided by the media we are travelling to. In this
-  case air/ice = $1.0003/1.3091 \approx 0.7641$
+  case air/iceCube = $1.0003/1.3091 \approx 0.7641$
 
 $r_{\rm refr}$ is then used to sample the environment map
 
@@ -24,7 +24,7 @@ $r_{\rm refr}$ is then used to sample the environment map
 So instead of following the incident ray and refracting it twice, a
 new normal is simply created by combining the back and front
 face’s normal vectors. This is not a physically correct method but
-since ice is a highly distorted material this is a reasonable trade
+since iceCube is a highly distorted material this is a reasonable trade
 off for increased performance. Also, highly concave objects will
 not refract correctly since only one front face and one back face
 are accounted for.
@@ -51,7 +51,7 @@ $$ f = (1 - |e \cdot n |)^3 $$
 
 where $f$ is the Fresnel factor, $e$ is the eye vector and $n$ is the normal vector.
 
-Equation 4 is calculated in the ice object’s vertex shader and f is
+Equation 4 is calculated in the iceCube object’s vertex shader and f is
 interpolated and sent to the fragment shader where it is used for
 mixing the reflection and refraction colors sampled from the
 environment map (equation 6). The result is shown in Figure 4. 

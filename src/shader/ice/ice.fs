@@ -11,5 +11,5 @@ uniform samplerCube envCubeMap;
 
 void main() {
 
-    FragColor = texture(envCubeMap, Position);
+    FragColor = texture(envCubeMap, vec3(Position.x, Position.y, Position.z));
 }

@@ -12,7 +12,7 @@ static void keyCallback(GLFWwindow *window, int key, int scancode, int action,
     return;
   }
 
-  auto scene = (Assignment2Scene *)glfwGetWindowUserPointer(window);
+  auto scene = (IcePond *)glfwGetWindowUserPointer(window);
   float iceSpeed = 0.5f;
   switch (key) {
   case GLFW_KEY_UP:
@@ -39,23 +39,23 @@ static void keyCallback(GLFWwindow *window, int key, int scancode, int action,
 }
 
 static void resizeCallback(GLFWwindow *window, int width, int height) {
-  auto scene = (Assignment2Scene *)glfwGetWindowUserPointer(window);
+  auto scene = (IcePond *)glfwGetWindowUserPointer(window);
   scene->resize(width, height);
 }
 
 static void mousePositionCallback(GLFWwindow *window, double xpos,
                                   double ypos) {
-  auto scene = (Assignment2Scene *)glfwGetWindowUserPointer(window);
+  auto scene = (IcePond *)glfwGetWindowUserPointer(window);
   scene->handleCursorPositionEvent(vec2(xpos, ypos));
 }
 
 static void mouseScrollCallback(GLFWwindow *window, double xoffset,
                                 double yoffset) {
-  auto scene = (Assignment2Scene *)glfwGetWindowUserPointer(window);
+  auto scene = (IcePond *)glfwGetWindowUserPointer(window);
   scene->camera->moveForward(yoffset);
 }
 
-Assignment2Scene::Assignment2Scene(GLFWwindow *window) {
+IcePond::IcePond(GLFWwindow *window) {
   this->currentWindow = window;
 
   glfwSetWindowSizeCallback(window, resizeCallback);
@@ -74,7 +74,7 @@ Assignment2Scene::Assignment2Scene(GLFWwindow *window) {
   glfwSetScrollCallback(window, mouseScrollCallback);
 }
 
-void Assignment2Scene::initScene() {
+void IcePond::initScene() {
   this->compileShaderPrograms();
 
   // glEnable(GL_DEPTH_TEST);
@@ -87,7 +87,10 @@ void Assignment2Scene::initScene() {
 
   this->ground_plane = new Plane(100, 100, 1, 1);
   this->ground_base = new Cube(100.0f); // Scale smaller vertically
-  this->ice = new Cube(2.0f);
+
+
+  this->iceCube = new Cube(2.0f);
+  this->iceTorus = new Torus(2.0f, 0.5f, 100, 100);
 
   // Add green color to ground plane
   // this->addColorToObject(this->ground_plane, {0.49, 0.78, 0.47});
@@ -101,18 +104,18 @@ void Assignment2Scene::initScene() {
                          {78.0 / 255.0, 53.0 / 255.0, 36.0 / 255.0});
 
   // Add blue color to ice
-  this->addColorToObject(this->ice,
+  this->addColorToObject(this->iceCube,
                          {102.0 / 255.0, 153.0 / 255.0, 204.0 / 255.0});
   this->basicShadingProgram.use();
   this->activeShaderProgram = &this->basicShadingProgram;
 }
 
-void Assignment2Scene::update(float t) {
+void IcePond::update(float t) {
   this->systemTime = t;
   this->computeActiveMatrices();
 }
 
-void Assignment2Scene::passMatrices() {
+void IcePond::passMatrices() {
 
   if (this->activeShaderProgram == nullptr) {
     fprintf(stderr, "Could not send matrices, no active shader program set!\n");
@@ -133,7 +136,7 @@ void Assignment2Scene::passMatrices() {
   this->activeShaderProgram->setUniform("ViewportMatrix", this->view);
 }
 
-void Assignment2Scene::compileShaderPrograms() {
+void IcePond::compileShaderPrograms() {
 
   this->basicShadingProgram.compileShader("shader/basic/basic.vs",
                                           GLSLShader::VERTEX);
@@ -148,16 +151,17 @@ void Assignment2Scene::compileShaderPrograms() {
   this->iceShadingProgram.link();
 }
 
-Assignment2Scene::~Assignment2Scene() {
+IcePond::~IcePond() {
   delete this->ground_plane;
   delete this->ground_base;
-  delete this->ice;
+  delete this->iceCube;
+  delete this->iceTorus;
 
   delete this->camera;
   delete this->envMapFBOObject;
 }
 
-void Assignment2Scene::handleCursorPositionEvent(glm::vec2 cursorPosition) {
+void IcePond::handleCursorPositionEvent(glm::vec2 cursorPosition) {
 
   // if mouse hasn't moved in the window, prevent camera from flipping out
   if (std::fabs(mousePosition.x - MOUSE_UNINITIALIZED) <= 0.000001f) {
@@ -172,7 +176,7 @@ void Assignment2Scene::handleCursorPositionEvent(glm::vec2 cursorPosition) {
   this->mousePosition = cursorPosition;
 }
 
-void Assignment2Scene::addColorToObject(TriangleMesh *object,
+void IcePond::addColorToObject(TriangleMesh *object,
                                         const std::vector<glm::vec3> &colors) {
   // Convert from vec3 array to strided array
   std::vector<GLfloat> stridedColors;
@@ -210,14 +214,14 @@ void Assignment2Scene::addColorToObject(TriangleMesh *object,
   glBindVertexArray(0);
 }
 
-void Assignment2Scene::addColorToObject(TriangleMesh *object, glm::vec3 color) {
+void IcePond::addColorToObject(TriangleMesh *object, glm::vec3 color) {
   std::vector<vec3> colors;
   for (int i = 0; i < object->getNumVerts(); i++)
     colors.emplace_back(color);
   this->addColorToObject(object, colors);
 }
 
-void Assignment2Scene::resize(int w, int h) {
+void IcePond::resize(int w, int h) {
   glViewport(0, 0, w, h);
   this->width = w;
   this->height = h;
@@ -226,7 +230,7 @@ void Assignment2Scene::resize(int w, int h) {
       glm::perspective(glm::radians(60.0f), aspectRatio, 0.3f, 100.0f);
 }
 
-void Assignment2Scene::computeActiveMatrices() {
+void IcePond::computeActiveMatrices() {
 
   this->projection = glm::perspective(glm::radians(60.0f),
                                       (float)width / height, 1.0f, 1000.0f);
