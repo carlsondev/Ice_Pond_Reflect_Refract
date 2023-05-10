@@ -2,7 +2,7 @@ set(target ice_pond)
 set( project_SOURCES
         ice_pond.cpp
         main.cpp
-        env_fbo_object.cpp env_fbo_object.h)
+        env_fbo_object.cpp env_fbo_object.h ice_pond_utils.cpp)
 
 add_executable( ${target} ${project_SOURCES} )
 

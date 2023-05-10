@@ -48,7 +48,6 @@ private:
   Cube *ground_base = nullptr;
 
   Cube *ice = nullptr;
-  Cube *test_block = nullptr;
 
   glm::vec2 mousePosition = {0, 0};
   glm::vec2 windowDimensions;

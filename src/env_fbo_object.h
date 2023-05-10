@@ -23,7 +23,7 @@ enum DIRECTION {
 class EnvironmentMapFBOObject {
 
 public:
-  EnvironmentMapFBOObject(glm::vec3 position, glm::vec2 windowDims);
+  EnvironmentMapFBOObject(glm::vec3 position);
 
   ~EnvironmentMapFBOObject();
 

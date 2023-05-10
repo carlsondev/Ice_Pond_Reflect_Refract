@@ -6,8 +6,7 @@
 
 #include <iostream>
 
-EnvironmentMapFBOObject::EnvironmentMapFBOObject(glm::vec3 position,
-                                                 glm::vec2 windowDims) {
+EnvironmentMapFBOObject::EnvironmentMapFBOObject(glm::vec3 position) {
   this->object_position = position;
 
   this->generateCubeMapFBO();
