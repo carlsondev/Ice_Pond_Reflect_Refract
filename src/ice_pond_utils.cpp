@@ -86,7 +86,7 @@ void IcePond::initScene() {
   this->camera->setRadius(50);
   this->envMapFBOObject = new EnvironmentMapFBOObject(this->ice_center_loc);
 
-  this->ground_plane = new Plane(100, 100, 1, 1);
+  this->ground_plane = new Plane(100, 50, 1, 1);
   this->ground_base = new Cube(100.0f); // Scale smaller vertically
 
 
@@ -98,12 +98,14 @@ void IcePond::initScene() {
   skyProg.setUniform("SkyBoxTex", 1);
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_CUBE_MAP, this->skyTex);
-  // Add green color to ground plane
-  // this->addColorToObject(this->ground_plane, {0.49, 0.78, 0.47});
+  // Add white color to ground plane (snow)
+  this->addColorToObject(this->ground_plane, {254.0/255.0, 247.0/255.0, 224.0/255.0});
 
+  /*
   this->addColorToObject(
       this->ground_plane,
       this->fillRandVec3Vector(this->ground_plane->getNumVerts()));
+      */
 
   // Add brown color to ground base
   this->addColorToObject(this->ground_base,

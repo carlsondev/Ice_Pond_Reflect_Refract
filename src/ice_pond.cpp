@@ -12,7 +12,7 @@ void IcePond::render_ground() {
 
   // Render ground plane
   this->model = mat4(1.0f);
-  this->model = glm::translate(model, vec3(0.0f, 0.0f, 0.0f));
+  this->model = glm::translate(model, vec3(0.0f, -10.0f, 0.0f));
   this->model = glm::scale(model, glm::vec3(1, 1, 1));
 
   this->passMatrices();
@@ -24,7 +24,7 @@ void IcePond::render_ground() {
 
   // Render ground base
   this->model = mat4(1.0f);
-  this->model = glm::translate(model, vec3(0.0f, -6.0f, 0.0f));
+  this->model = glm::translate(model, vec3(0.0f, -20.0f, 0.0f));
   this->model = glm::scale(model, glm::vec3(1, 0.1, 1));
 
   this->passMatrices();
