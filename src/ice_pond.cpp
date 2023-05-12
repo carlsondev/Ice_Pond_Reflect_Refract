@@ -3,6 +3,7 @@
 //
 
 #include "ice_pond.h"
+#include "texture.h"
 
 using namespace glm;
 
@@ -59,6 +60,14 @@ void IcePond::render_objects(glm::mat4 view_matrix, bool do_render_ice,
   this->view = view_matrix;
 
   this->render_ground();
+
+  this->activeShaderProgram = &this->skyProg;
+  // Draw sky
+	skyProg.use();
+	model = mat4(1.0f);
+	this->passMatrices();
+	sky->render();
+
 
   if (do_render_ice_fbo) {
     this->iceShadingProgram.use();

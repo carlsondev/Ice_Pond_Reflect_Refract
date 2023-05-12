@@ -3,6 +3,7 @@
 //
 
 #include "ice_pond.h"
+#include "texture.h"
 
 using namespace glm;
 
@@ -92,6 +93,11 @@ void IcePond::initScene() {
   this->iceCube = new Cube(2.0f);
   this->iceTorus = new Torus(2.0f, 0.5f, 100, 100);
 
+  this->sky = new SkyBox(100.0f);
+  this->skyTex = Texture::loadCubeMap("../media/texture/cube/snowy/snowy", ".png");
+  skyProg.setUniform("SkyBoxTex", 1);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, this->skyTex);
   // Add green color to ground plane
   // this->addColorToObject(this->ground_plane, {0.49, 0.78, 0.47});
 
@@ -137,6 +143,9 @@ void IcePond::passMatrices() {
 }
 
 void IcePond::compileShaderPrograms() {
+  this->skyProg.compileShader("shader/skybox/skybox.vert.glsl");
+  this->skyProg.compileShader("shader/skybox/skybox.frag.glsl");
+  this->skyProg.link();
 
   this->basicShadingProgram.compileShader("shader/basic/basic.vs",
                                           GLSLShader::VERTEX);
@@ -227,7 +236,7 @@ void IcePond::resize(int w, int h) {
   this->height = h;
   float aspectRatio = (float)w / (float)h;
   this->main_projection =
-      glm::perspective(glm::radians(60.0f), aspectRatio, 0.3f, 100.0f);
+      glm::perspective(glm::radians(60.0f), aspectRatio, 0.3f, 500.0f);
 }
 
 void IcePond::computeActiveMatrices() {

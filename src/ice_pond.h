@@ -19,6 +19,8 @@
 #include "teapotpatch.h"
 #include "torus.h"
 #include "trianglemesh.h"
+#include "skybox.h"
+
 
 #include "ArcballCam.hpp"
 #include "env_fbo_object.h"
@@ -41,12 +43,16 @@ private:
 
   GLSLProgram basicShadingProgram;
   GLSLProgram iceShadingProgram;
+  GLSLProgram skyProg;
   // The currently used shader program
   GLSLProgram *activeShaderProgram = nullptr;
 
   // Rendered objects
   Plane *ground_plane = nullptr;
   Cube *ground_base = nullptr;
+  SkyBox *sky = nullptr;
+  GLuint skyTex;
+
 
   Cube *iceCube = nullptr;
   Torus *iceTorus = nullptr;
@@ -68,6 +74,8 @@ private:
   void computeActiveMatrices();
 
   void passMatrices();
+
+  void passSkyMatrices();
 
   // Add color to "ingredients" object using a vector of colors for every
   // vertex.
