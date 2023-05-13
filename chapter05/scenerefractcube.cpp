@@ -16,17 +16,27 @@ SceneRefractCube::SceneRefractCube() : angle(0.0f), tPrev(0.0f), rotSpeed(glm::p
 
 void SceneRefractCube::initScene()
 {
-    compileAndLinkShader();
+  compileAndLinkShader();
 
-    glEnable(GL_DEPTH_TEST);
-    angle = glm::radians(90.0f);
+  glEnable(GL_DEPTH_TEST);
+  angle = glm::radians(90.0f);
 
   GLuint cubeTex = Texture::loadCubeMap("../media/texture/cube/snowy/snowy", ".png");
+  GLuint iceTex = Texture::loadTexture("../media/texture/ice/IceColor.png");
+  GLuint iceNormalTex = Texture::loadTexture("../media/texture/ice/IceNomalGL.png");
+  GLuint iceDisplacementTex = Texture::loadTexture("../media/texture/ice/IceDisplacement.png");
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
+
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubeTex);
 
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, iceTex);
+
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, iceNormalTex);
 
 #ifdef __APPLE__
 	prog.setUniform("CubeMapTex", 0);
@@ -61,6 +71,10 @@ void SceneRefractCube::render()
     prog.setUniform("WorldCameraPosition", cameraPos);
     prog.setUniform("Material.Eta", 0.94f);
     prog.setUniform("Material.ReflectionFactor", 0.1f);
+    vec3 matKD = vec3(0.9f, 0.5f, 0.3f);
+    prog.setUniform("Material.Ks", vec3( 0.8f, 0.8f, 0.8f));
+    prog.setUniform("Material.Shininess", 100.0f);
+    prog.setUniform("Light.Ls", vec3( 1.0f, 1.0f, 1.0f));
 
     model = glm::translate(mat4(1.0f), vec3(0.0f,-1.0f,0.0f));
     model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f,0.0f,0.0f));
