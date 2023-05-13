@@ -93,6 +93,12 @@ void IcePond::initScene() {
   this->iceTorus = new Torus(2.0f, 0.5f, 100, 100);
   this->iceTeapot = new Teapot(14, mat4(1.0f));
 
+  this->iceNormalTex =
+      Texture::loadTexture("../media/texture/ice_crack_normal.png");
+
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, this->iceNormalTex);
+
   this->sky = new SkyBox(100.0f);
   this->skyTex =
       Texture::loadCubeMap("../media/texture/cube/snowy/snowy", ".png");
@@ -147,6 +153,7 @@ void IcePond::passMatrices() {
 
   this->activeShaderProgram->setUniform("CameraPosition",
                                         this->camera->getPosition());
+  this->activeShaderProgram->setUniform("IceCrackNormalTex", 3);
 }
 
 void IcePond::compileShaderPrograms() {

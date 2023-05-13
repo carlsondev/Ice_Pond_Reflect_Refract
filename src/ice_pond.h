@@ -59,6 +59,8 @@ private:
   Torus *iceTorus = nullptr;
   Teapot *iceTeapot = nullptr;
 
+  GLuint iceNormalTex;
+
   glm::vec2 mousePosition = {0, 0};
   glm::vec2 windowDimensions;
 

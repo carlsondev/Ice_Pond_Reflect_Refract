@@ -14,10 +14,17 @@ layout (location=0) out vec4 FragColor;
 uniform samplerCube envCubeMap;
 uniform samplerCube normCubeMap;
 
+uniform sampler2D IceCrackNormalTex;
+
 const float a = 0.33;
 const float eta = 0.7641;
 
 void main() {
+
+    // Center sphere of model ( x, y, and z range from 0 to 1)
+    vec3 crack_position = normalize(Position);
+    vec3 crack_norm = texture(IceCrackNormalTex, crack_position.xz).xyz;
+    vec3 crack_ref_color = texture(envCubeMap, reflect(WorldEyeVec, crack_norm)).xyz;
 
     // Potential room for error
     vec3 norm_backface = texture(normCubeMap, WorldEyeVec).xyz;
@@ -35,6 +42,7 @@ void main() {
     vec3 color_reflected = texture(envCubeMap, reflected_eye).xyz;
 
     vec3 mixed_color = mix(color_refracted, color_reflected, FresnelTerm);
+    mixed_color = mix(mixed_color, crack_ref_color, 0.6);
 
     FragColor = vec4(mixed_color, 1.0);
     //FragColor = texture(normCubeMap, Normal);

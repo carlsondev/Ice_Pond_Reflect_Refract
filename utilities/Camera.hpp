@@ -134,8 +134,6 @@ inline Camera::Camera() {
 }
 
 inline void Camera::rotate(GLfloat dTheta, GLfloat dPhi) {
-  printf("Camera::rotate( %f, %f )\n", dTheta, dPhi);
-  printf("Existing theta = %f, phi = %f\n", _theta, _phi);
   _theta += dTheta;       // update theta, yaw
   _phi += dPhi;           // update phi, pitch
   _clampPhi();            // bounds check phi
