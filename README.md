@@ -2,6 +2,8 @@
 
 ## Build Information
 
+To compile the code, refer to the CMakeLists.txt referenced below and modify it to your operating system. The code should then compile similar to the previous projects in the semester. The main project to be built is src (version 2, our final model). The executable for src is ./ice_pond. While running ./ice_pond, use the W/A/S/D keys to manipulate the position of the ice model. Use the C key to toggle the crack model on and off.
+
 ### CMakelists.txt (Windows)
 
 ```
