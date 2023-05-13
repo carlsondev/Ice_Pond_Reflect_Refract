@@ -1,6 +1,6 @@
 #version 430
 
-layout(binding=1) uniform samplerCube SkyBoxTex;
+layout(binding=2) uniform samplerCube SkyBoxTex;
 in vec3 Vec;
 layout( location = 0 ) out vec4 FragColor;
 

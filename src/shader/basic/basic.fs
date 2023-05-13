@@ -9,5 +9,5 @@ layout (location=1) out vec3 FragNormal;
 
 void main() {
     FragColor = vec4(Color, 1.0);
-    FragNormal = Normal; // Maybe make negative?
+    FragNormal = -Normal; // Maybe make negative?
 }

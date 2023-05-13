@@ -11,6 +11,8 @@ out vec2 TexCoord;
 out vec3 Color;
 
 out vec3 ReflectDir;
+out vec3 WorldEyeVec;
+out float FresnelTerm;
 
 uniform vec3 CameraPosition;
 
@@ -25,9 +27,11 @@ void main() {
 
     vec3 worldPos = vec3( ModelMatrix * vec4(VertexPosition,1.0) );
     vec3 worldNorm = vec3(ModelMatrix * vec4(VertexNormal, 0.0));
-    vec3 worldView = normalize( CameraPosition - worldPos );
+    WorldEyeVec = normalize( CameraPosition - worldPos );
 
-    ReflectDir = reflect(-worldView, worldNorm );
+    ReflectDir = reflect(-WorldEyeVec, worldNorm );
+
+    FresnelTerm = pow(1 - dot(WorldEyeVec, VertexNormal), 3);
 
     Position = VertexPosition;
     TexCoord = VertexTexCoord;

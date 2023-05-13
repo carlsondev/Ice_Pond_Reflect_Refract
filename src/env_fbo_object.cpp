@@ -9,7 +9,8 @@
 EnvironmentMapFBOObject::EnvironmentMapFBOObject(glm::vec3 position) {
   this->object_position = position;
 
-  this->generateCubeMapFBO();
+  this->generateCubeMapFBO(this->envCubeMapTexture);
+  this->generateCubeMapFBO(this->normCubeMapTexture);
 
   this->internal_camera = new BasicCamera();
   this->internal_camera->setPosition(position);
@@ -47,20 +48,34 @@ void EnvironmentMapFBOObject::bindCubeMapFBO(DIRECTION direction,
   // Bind env texture
   // Assumes uniforms for images are texture_posx = 0, texture_negx = 1, etc.
   this->rotateCameraToDirection(direction);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTexture);
+  if (bind_norm) {
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, normCubeMapTexture);
 
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, cubeMapFBO);
-  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                         GL_TEXTURE_CUBE_MAP_POSITIVE_X + direction,
-                         cubeMapTexture, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->cubeMapFBO);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1,
+                           GL_TEXTURE_CUBE_MAP_POSITIVE_X + direction,
+                           normCubeMapTexture, 0);
 
-  GLuint drawBuffers[2] = {GL_COLOR_ATTACHMENT0, GL_NONE};
+    GLuint drawBuffers[2] = {GL_NONE, GL_COLOR_ATTACHMENT1};
 
-  glDrawBuffers(2, drawBuffers);
+    glDrawBuffers(2, drawBuffers);
+  } else {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, envCubeMapTexture);
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->cubeMapFBO);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                           GL_TEXTURE_CUBE_MAP_POSITIVE_X + direction,
+                           envCubeMapTexture, 0);
+
+    GLuint drawBuffers[2] = {GL_COLOR_ATTACHMENT0, GL_NONE};
+
+    glDrawBuffers(2, drawBuffers);
+  }
 }
 
-void EnvironmentMapFBOObject::generateCubeMapFBO() {
+void EnvironmentMapFBOObject::generateCubeMapFBO(GLuint &cubeMapTexture) {
 
   // Setup Cube Map Texture
   glGenTextures(1, &cubeMapTexture);
@@ -80,8 +95,8 @@ void EnvironmentMapFBOObject::generateCubeMapFBO() {
   glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
   // Generate FBO
-  glGenFramebuffers(1, &cubeMapFBO);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, cubeMapFBO);
+  glGenFramebuffers(1, &this->cubeMapFBO);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, this->cubeMapFBO);
 
   // 13:00
   // Attach cube map side texture to FBO
@@ -92,14 +107,14 @@ void EnvironmentMapFBOObject::generateCubeMapFBO() {
   }
 
   // Generate render buffer
-  glGenRenderbuffers(1, &renderBuffer);
-  glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+  glGenRenderbuffers(1, &this->renderBuffer);
+  glBindRenderbuffer(GL_RENDERBUFFER, this->renderBuffer);
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, CUBE_MAP_WIDTH,
                         CUBE_MAP_WIDTH);
 
   // Attach render buffer to FBO
   glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                            GL_RENDERBUFFER, renderBuffer);
+                            GL_RENDERBUFFER, this->renderBuffer);
 
   // Check status
   if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
@@ -112,12 +127,18 @@ void EnvironmentMapFBOObject::generateCubeMapFBO() {
 }
 
 EnvironmentMapFBOObject::~EnvironmentMapFBOObject() {
-  for (int i = 0; i < 6; i++) {
-    glDeleteTextures(1, &fboNormalTextureArray[i]);
-  }
+
+  glDeleteTextures(1, &normCubeMapTexture);
+  glDeleteTextures(1, &envCubeMapTexture);
+
+  glDeleteFramebuffers(1, &cubeMapFBO);
+  glDeleteRenderbuffers(1, &renderBuffer);
 
   delete this->internal_camera;
 }
 void EnvironmentMapFBOObject::bindCubeMapTexture() {
-  glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTexture);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, envCubeMapTexture);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, normCubeMapTexture);
 }

@@ -96,8 +96,8 @@ void IcePond::initScene() {
   this->sky = new SkyBox(100.0f);
   this->skyTex =
       Texture::loadCubeMap("../media/texture/cube/snowy/snowy", ".png");
-  skyProg.setUniform("SkyBoxTex", 1);
-  glActiveTexture(GL_TEXTURE1);
+  skyProg.setUniform("SkyBoxTex", 2);
+  glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_CUBE_MAP, this->skyTex);
   // Add white color to ground plane (snow)
   this->addColorToObject(this->ground_plane,
