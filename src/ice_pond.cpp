@@ -36,8 +36,7 @@ void IcePond::render_ice() {
 
   // Render ice
   this->model = mat4(1.0f);
-  this->model = glm::translate(model, this->ice_center_loc);
-  this->model = glm::scale(model, glm::vec3(1, 1, 1));
+  this->model = glm::scale(model, glm::vec3(5, 1, 5));
 
   this->passMatrices();
 
@@ -47,7 +46,7 @@ void IcePond::render_ice() {
   MaterialProperties iceMaterialProperties{
       {0.9f, 0.5f, 0.3f}, {0.9f, 0.5f, 0.3f}, {0.8f, 0.8f, 0.8f}, 1.0f};
 
-  iceTorus->render();
+  iceCube->render();
 }
 
 void IcePond::render_objects(glm::mat4 view_matrix, bool do_render_ice,
@@ -58,16 +57,14 @@ void IcePond::render_objects(glm::mat4 view_matrix, bool do_render_ice,
   this->activeShaderProgram = &this->basicShadingProgram;
 
   this->view = view_matrix;
-
-  this->render_ground();
+  // this->render_ground();
 
   this->activeShaderProgram = &this->skyProg;
   // Draw sky
-	skyProg.use();
-	model = mat4(1.0f);
-	this->passMatrices();
-	sky->render();
-
+  skyProg.use();
+  model = mat4(1.0f);
+  this->passMatrices();
+  sky->render();
 
   if (do_render_ice_fbo) {
     this->iceShadingProgram.use();

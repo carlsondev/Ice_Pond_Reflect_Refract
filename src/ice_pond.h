@@ -16,11 +16,13 @@
 
 #include "cube.h"
 #include "plane.h"
+#include "skybox.h"
+#include "sphere.h"
+#include "teapot.h"
 #include "teapotpatch.h"
 #include "torus.h"
-#include "trianglemesh.h"
-#include "skybox.h"
 
+#include "trianglemesh.h"
 
 #include "ArcballCam.hpp"
 #include "env_fbo_object.h"
@@ -53,9 +55,9 @@ private:
   SkyBox *sky = nullptr;
   GLuint skyTex;
 
-
   Cube *iceCube = nullptr;
   Torus *iceTorus = nullptr;
+  Teapot *iceTeapot = nullptr;
 
   glm::vec2 mousePosition = {0, 0};
   glm::vec2 windowDimensions;
@@ -74,8 +76,6 @@ private:
   void computeActiveMatrices();
 
   void passMatrices();
-
-  void passSkyMatrices();
 
   // Add color to "ingredients" object using a vector of colors for every
   // vertex.
@@ -118,6 +118,7 @@ public:
 
   void shiftIcePosition(glm::vec3 delta) {
     this->ice_center_loc += delta;
+    this->camera->setLookAtPoint(this->ice_center_loc);
     if (this->envMapFBOObject != nullptr)
       this->envMapFBOObject->setObjectPosition(this->ice_center_loc);
   }

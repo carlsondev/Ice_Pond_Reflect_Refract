@@ -89,17 +89,19 @@ void IcePond::initScene() {
   this->ground_plane = new Plane(100, 50, 1, 1);
   this->ground_base = new Cube(100.0f); // Scale smaller vertically
 
-
-  this->iceCube = new Cube(2.0f);
+  this->iceCube = new Cube(4.0f);
   this->iceTorus = new Torus(2.0f, 0.5f, 100, 100);
+  this->iceTeapot = new Teapot(14, mat4(1.0f));
 
   this->sky = new SkyBox(100.0f);
-  this->skyTex = Texture::loadCubeMap("../media/texture/cube/snowy/snowy", ".png");
+  this->skyTex =
+      Texture::loadCubeMap("../media/texture/cube/snowy/snowy", ".png");
   skyProg.setUniform("SkyBoxTex", 1);
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_CUBE_MAP, this->skyTex);
   // Add white color to ground plane (snow)
-  this->addColorToObject(this->ground_plane, {254.0/255.0, 247.0/255.0, 224.0/255.0});
+  this->addColorToObject(this->ground_plane,
+                         {254.0 / 255.0, 247.0 / 255.0, 224.0 / 255.0});
 
   /*
   this->addColorToObject(
@@ -142,6 +144,9 @@ void IcePond::passMatrices() {
   this->activeShaderProgram->setUniform("MVP", projection * mvMat);
 
   this->activeShaderProgram->setUniform("ViewportMatrix", this->view);
+
+  this->activeShaderProgram->setUniform("CameraPosition",
+                                        this->camera->getPosition());
 }
 
 void IcePond::compileShaderPrograms() {
@@ -167,6 +172,7 @@ IcePond::~IcePond() {
   delete this->ground_base;
   delete this->iceCube;
   delete this->iceTorus;
+  delete this->iceTeapot;
 
   delete this->camera;
   delete this->envMapFBOObject;
@@ -188,7 +194,7 @@ void IcePond::handleCursorPositionEvent(glm::vec2 cursorPosition) {
 }
 
 void IcePond::addColorToObject(TriangleMesh *object,
-                                        const std::vector<glm::vec3> &colors) {
+                               const std::vector<glm::vec3> &colors) {
   // Convert from vec3 array to strided array
   std::vector<GLfloat> stridedColors;
   for (vec3 color : colors) {

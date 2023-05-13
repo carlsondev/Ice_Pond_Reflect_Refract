@@ -55,7 +55,7 @@ private:
   GLuint cubeMapFBO;
   GLuint renderBuffer;
 
-  const int CUBE_MAP_WIDTH = 256;
+  const int CUBE_MAP_WIDTH = 512;
 
   void rotateCameraToDirection(DIRECTION direction);
 

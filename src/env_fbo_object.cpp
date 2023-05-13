@@ -17,40 +17,25 @@ EnvironmentMapFBOObject::EnvironmentMapFBOObject(glm::vec3 position) {
 
 // 9:00
 void EnvironmentMapFBOObject::rotateCameraToDirection(DIRECTION direction) {
-  if (direction == POSITIVE_Y) {
-    // Set up vector to look at vertical points
-    this->internal_camera->setUpVector(glm::vec3(0.0f, 0.0f, -1.0f));
-  } else if (direction == NEGATIVE_Y) {
-    this->internal_camera->setUpVector(glm::vec3(0.0f, 0.0f, 1.0f));
-  } else {
-    // Set up vector to look at horizontal points
-    this->internal_camera->setUpVector(glm::vec3(0.0f, 1.0f, 0));
-  }
 
   switch (direction) {
   case POSITIVE_X:
-    this->internal_camera->setLookAtPoint(this->object_position +
-                                          glm::vec3(1.0f, 0.0f, 0.0f));
+    this->internal_camera->set_pitch_yaw(0, 90);
     break;
   case NEGATIVE_X:
-    this->internal_camera->setLookAtPoint(this->object_position +
-                                          glm::vec3(-1.0f, 0.0f, 0.0f));
+    this->internal_camera->set_pitch_yaw(0, -90);
     break;
   case POSITIVE_Y:
-    this->internal_camera->setLookAtPoint(this->object_position +
-                                          glm::vec3(0.0f, 1.0f, 0.0f));
+    this->internal_camera->set_pitch_yaw(-90, 180);
     break;
   case NEGATIVE_Y:
-    this->internal_camera->setLookAtPoint(this->object_position +
-                                          glm::vec3(0.0f, -1.0f, 0.0f));
+    this->internal_camera->set_pitch_yaw(90, 180);
     break;
   case POSITIVE_Z:
-    this->internal_camera->setLookAtPoint(this->object_position +
-                                          glm::vec3(0.0f, 0.0f, 1.0f));
+    this->internal_camera->set_pitch_yaw(0, 180);
     break;
   case NEGATIVE_Z:
-    this->internal_camera->setLookAtPoint(this->object_position +
-                                          glm::vec3(0.0f, 0.0f, -1.0f));
+    this->internal_camera->set_pitch_yaw(0, 0);
     break;
   }
 
