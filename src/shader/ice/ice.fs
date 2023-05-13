@@ -16,6 +16,8 @@ uniform samplerCube normCubeMap;
 
 uniform sampler2D IceCrackNormalTex;
 
+uniform bool useCrackModel;
+
 const float a = 0.33;
 const float eta = 0.7641;
 
@@ -33,32 +35,31 @@ void get_refract_reflect(vec3 normal, out vec3 reflect, out vec3 refract){
     reflect = WorldEyeVec - (2*dot(WorldEyeVec, normal)*normal);
 }
 
-void main() {
-
-
-    // "Normal" internal reflection and refraction
+vec3 get_color_for_normal(vec3 normal){
     vec3 reflected_eye, refracted_eye;
-    get_refract_reflect(Normal, reflected_eye, refracted_eye);
+    get_refract_reflect(normal, reflected_eye, refracted_eye);
 
     vec3 color_refracted = texture(envCubeMap, refracted_eye).xyz;
     vec3 color_reflected = texture(envCubeMap, reflected_eye).xyz;
 
     vec3 mixed_norm_color = mix(color_refracted, color_reflected, FresnelTerm);
+    return mixed_norm_color;
+}
 
+void main() {
 
+    if (useCrackModel){
+        // "Cracked" internal reflection and refraction, with normal chosen from texture
+        vec3 crack_position = normalize(Position);
+        vec3 crack_norm = texture(IceCrackNormalTex, crack_position.xz).xyz;
 
-    // "Cracked" internal reflection and refraction, with normal chosen from texture
-    vec3 crack_position = normalize(Position);
-    vec3 crack_norm = texture(IceCrackNormalTex, crack_position.xz).xyz;
+        vec3 mixed_crack_color = get_color_for_normal(crack_norm);
 
-    vec3 refl_crack, refract_crack;
-    get_refract_reflect(crack_norm, refl_crack, refract_crack);
+        FragColor = vec4(mixed_crack_color, 1.0);
+    }else{
+        // "Normal" internal reflection and refraction
+        vec3 mixed_norm_color = get_color_for_normal(Normal);
 
-    vec3 refract_crack_ref_color = texture(envCubeMap, refract_crack).xyz;
-    vec3 reflect_crack_ref_color = texture(envCubeMap, refl_crack).xyz;
-    vec3 mixed_crack_color = mix(refract_crack_ref_color, reflect_crack_ref_color, FresnelTerm);
-
-    // Choose specific fragment color
-    FragColor = vec4(mixed_norm_color, 1.0);
-    FragColor = vec4(mixed_crack_color, 1.0);
+        FragColor = vec4(mixed_norm_color, 1.0);
+    }
 }

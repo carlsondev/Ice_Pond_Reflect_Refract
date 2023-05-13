@@ -9,11 +9,22 @@ using namespace glm;
 
 static void keyCallback(GLFWwindow *window, int key, int scancode, int action,
                         int mods) {
+
+  auto scene = (IcePond *)glfwGetWindowUserPointer(window);
   if (action != GLFW_REPEAT) {
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+      glfwSetWindowShouldClose(window, GL_TRUE);
+      return;
+    }
+    if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
+      scene->toggleCrackModel();
+      return;
+    }
+
     return;
   }
 
-  auto scene = (IcePond *)glfwGetWindowUserPointer(window);
   float iceSpeed = 0.5f;
   switch (key) {
   case GLFW_KEY_UP:
@@ -22,10 +33,10 @@ static void keyCallback(GLFWwindow *window, int key, int scancode, int action,
   case GLFW_KEY_DOWN:
     scene->shiftIcePosition(vec3(0, -iceSpeed, 0));
     break;
-  case GLFW_KEY_LEFT:
+  case GLFW_KEY_A:
     scene->shiftIcePosition(vec3(-iceSpeed, 0, 0));
     break;
-  case GLFW_KEY_RIGHT:
+  case GLFW_KEY_D:
     scene->shiftIcePosition(vec3(iceSpeed, 0, 0));
     break;
   case GLFW_KEY_W:
@@ -37,11 +48,6 @@ static void keyCallback(GLFWwindow *window, int key, int scancode, int action,
   default:
     break;
   }
-}
-
-static void resizeCallback(GLFWwindow *window, int width, int height) {
-  auto scene = (IcePond *)glfwGetWindowUserPointer(window);
-  scene->resize(width, height);
 }
 
 static void mousePositionCallback(GLFWwindow *window, double xpos,
@@ -58,8 +64,6 @@ static void mouseScrollCallback(GLFWwindow *window, double xoffset,
 
 IcePond::IcePond(GLFWwindow *window) {
   this->currentWindow = window;
-
-  glfwSetWindowSizeCallback(window, resizeCallback);
 
   int width, height = 0;
 
@@ -154,6 +158,8 @@ void IcePond::passMatrices() {
   this->activeShaderProgram->setUniform("CameraPosition",
                                         this->camera->getPosition());
   this->activeShaderProgram->setUniform("IceCrackNormalTex", 3);
+  this->activeShaderProgram->setUniform("useCrackModel",
+                                        this->crackModelIsEnabled);
 }
 
 void IcePond::compileShaderPrograms() {

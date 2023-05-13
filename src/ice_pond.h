@@ -64,6 +64,8 @@ private:
   glm::vec2 mousePosition = {0, 0};
   glm::vec2 windowDimensions;
 
+  bool crackModelIsEnabled = false;
+
   glm::mat4 main_projection;
 
   float systemTime = 0;
@@ -111,6 +113,10 @@ public:
 
   void render_objects(glm::mat4 viewMatrix, bool do_render_ice = true,
                       bool do_render_ice_fbo = false);
+
+  void toggleCrackModel(){
+        this->crackModelIsEnabled = !this->crackModelIsEnabled;
+  }
 
   void render_ground();
 
