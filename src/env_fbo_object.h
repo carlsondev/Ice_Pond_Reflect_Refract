@@ -48,18 +48,19 @@ public:
   BasicCamera *internal_camera;
 
 private:
-  GLuint fboNormalTextureArray[6];
   glm::vec3 object_position;
 
-  GLuint cubeMapTexture;
+  GLuint envCubeMapTexture;
+  GLuint normCubeMapTexture;
+
   GLuint cubeMapFBO;
   GLuint renderBuffer;
 
-  const int CUBE_MAP_WIDTH = 256;
+  const int CUBE_MAP_WIDTH = 512;
 
   void rotateCameraToDirection(DIRECTION direction);
 
-  void generateCubeMapFBO();
+  void generateCubeMapFBO(GLuint &cubeMapTexture);
 };
 
 #endif // ICE_POND_ENV_FBO_OBJECT_H

@@ -10,6 +10,12 @@ out vec3 Normal;
 out vec2 TexCoord;
 out vec3 Color;
 
+out vec3 ReflectDir;
+out vec3 WorldEyeVec;
+out float FresnelTerm;
+
+uniform vec3 CameraPosition;
+
 uniform mat4 ModelViewMatrix;
 uniform mat4 ModelMatrix;
 uniform mat3 NormalMatrix;
@@ -18,7 +24,16 @@ uniform mat4 MVP;
 
 void main() {
     Normal = normalize( NormalMatrix * VertexNormal);
-    Position =VertexPosition;
+
+    vec3 worldPos = vec3( ModelMatrix * vec4(VertexPosition,1.0) );
+    vec3 worldNorm = vec3(ModelMatrix * vec4(VertexNormal, 0.0));
+    WorldEyeVec = normalize( CameraPosition - worldPos );
+
+    ReflectDir = reflect(-WorldEyeVec, worldNorm );
+
+    FresnelTerm = pow(1 - dot(WorldEyeVec, VertexNormal), 3);
+
+    Position = VertexPosition;
     TexCoord = VertexTexCoord;
     Color = VertexColor;
     gl_Position = MVP * vec4(VertexPosition,1.0);

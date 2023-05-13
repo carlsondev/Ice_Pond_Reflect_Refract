@@ -9,11 +9,22 @@ using namespace glm;
 
 static void keyCallback(GLFWwindow *window, int key, int scancode, int action,
                         int mods) {
+
+  auto scene = (IcePond *)glfwGetWindowUserPointer(window);
   if (action != GLFW_REPEAT) {
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+      glfwSetWindowShouldClose(window, GL_TRUE);
+      return;
+    }
+    if (key == GLFW_KEY_C && action == GLFW_RELEASE) {
+      scene->toggleCrackModel();
+      return;
+    }
+
     return;
   }
 
-  auto scene = (IcePond *)glfwGetWindowUserPointer(window);
   float iceSpeed = 0.5f;
   switch (key) {
   case GLFW_KEY_UP:
@@ -22,10 +33,10 @@ static void keyCallback(GLFWwindow *window, int key, int scancode, int action,
   case GLFW_KEY_DOWN:
     scene->shiftIcePosition(vec3(0, -iceSpeed, 0));
     break;
-  case GLFW_KEY_LEFT:
+  case GLFW_KEY_A:
     scene->shiftIcePosition(vec3(-iceSpeed, 0, 0));
     break;
-  case GLFW_KEY_RIGHT:
+  case GLFW_KEY_D:
     scene->shiftIcePosition(vec3(iceSpeed, 0, 0));
     break;
   case GLFW_KEY_W:
@@ -37,11 +48,6 @@ static void keyCallback(GLFWwindow *window, int key, int scancode, int action,
   default:
     break;
   }
-}
-
-static void resizeCallback(GLFWwindow *window, int width, int height) {
-  auto scene = (IcePond *)glfwGetWindowUserPointer(window);
-  scene->resize(width, height);
 }
 
 static void mousePositionCallback(GLFWwindow *window, double xpos,
@@ -58,8 +64,6 @@ static void mouseScrollCallback(GLFWwindow *window, double xoffset,
 
 IcePond::IcePond(GLFWwindow *window) {
   this->currentWindow = window;
-
-  glfwSetWindowSizeCallback(window, resizeCallback);
 
   int width, height = 0;
 
@@ -89,17 +93,25 @@ void IcePond::initScene() {
   this->ground_plane = new Plane(100, 50, 1, 1);
   this->ground_base = new Cube(100.0f); // Scale smaller vertically
 
-
-  this->iceCube = new Cube(2.0f);
+  this->iceCube = new Cube(4.0f);
   this->iceTorus = new Torus(2.0f, 0.5f, 100, 100);
+  this->iceTeapot = new Teapot(14, mat4(1.0f));
+
+  this->iceNormalTex =
+      Texture::loadTexture("../media/texture/ice_crack_normal.jpg");
+
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, this->iceNormalTex);
 
   this->sky = new SkyBox(100.0f);
-  this->skyTex = Texture::loadCubeMap("../media/texture/cube/snowy/snowy", ".png");
-  skyProg.setUniform("SkyBoxTex", 1);
-  glActiveTexture(GL_TEXTURE1);
+  this->skyTex =
+      Texture::loadCubeMap("../media/texture/cube/snowy/snowy", ".png");
+  skyProg.setUniform("SkyBoxTex", 2);
+  glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_CUBE_MAP, this->skyTex);
   // Add white color to ground plane (snow)
-  this->addColorToObject(this->ground_plane, {254.0/255.0, 247.0/255.0, 224.0/255.0});
+  this->addColorToObject(this->ground_plane,
+                         {254.0 / 255.0, 247.0 / 255.0, 224.0 / 255.0});
 
   /*
   this->addColorToObject(
@@ -142,6 +154,12 @@ void IcePond::passMatrices() {
   this->activeShaderProgram->setUniform("MVP", projection * mvMat);
 
   this->activeShaderProgram->setUniform("ViewportMatrix", this->view);
+
+  this->activeShaderProgram->setUniform("CameraPosition",
+                                        this->camera->getPosition());
+  this->activeShaderProgram->setUniform("IceCrackNormalTex", 3);
+  this->activeShaderProgram->setUniform("useCrackModel",
+                                        this->crackModelIsEnabled);
 }
 
 void IcePond::compileShaderPrograms() {
@@ -167,6 +185,7 @@ IcePond::~IcePond() {
   delete this->ground_base;
   delete this->iceCube;
   delete this->iceTorus;
+  delete this->iceTeapot;
 
   delete this->camera;
   delete this->envMapFBOObject;
@@ -188,7 +207,7 @@ void IcePond::handleCursorPositionEvent(glm::vec2 cursorPosition) {
 }
 
 void IcePond::addColorToObject(TriangleMesh *object,
-                                        const std::vector<glm::vec3> &colors) {
+                               const std::vector<glm::vec3> &colors) {
   // Convert from vec3 array to strided array
   std::vector<GLfloat> stridedColors;
   for (vec3 color : colors) {
