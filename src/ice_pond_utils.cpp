@@ -94,7 +94,7 @@ void IcePond::initScene() {
   this->iceTeapot = new Teapot(14, mat4(1.0f));
 
   this->iceNormalTex =
-      Texture::loadTexture("../media/texture/ice_crack_normal.png");
+      Texture::loadTexture("../media/texture/ice_crack_normal.jpg");
 
   glActiveTexture(GL_TEXTURE3);
   glBindTexture(GL_TEXTURE_2D, this->iceNormalTex);

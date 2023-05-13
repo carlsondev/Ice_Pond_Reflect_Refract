@@ -38,6 +38,7 @@ void IcePond::render_ice() {
   this->model = mat4(1.0f);
   this->model =
       glm::rotate(model, glm::radians(-90.0f), vec3(1.0f, 0.0f, 0.0f));
+  this->model = glm::translate(model, this->ice_center_loc);
   // this->model = glm::scale(model, glm::vec3(5, 1, 5));
 
   this->passMatrices();

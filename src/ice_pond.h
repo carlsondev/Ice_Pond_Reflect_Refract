@@ -121,6 +121,7 @@ public:
   void shiftIcePosition(glm::vec3 delta) {
     this->ice_center_loc += delta;
     this->camera->setLookAtPoint(this->ice_center_loc);
+    this->camera->recomputeOrientation();
     if (this->envMapFBOObject != nullptr)
       this->envMapFBOObject->setObjectPosition(this->ice_center_loc);
   }
